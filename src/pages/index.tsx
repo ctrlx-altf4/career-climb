@@ -1,8 +1,17 @@
 import { Button } from "@/components/ui/button";
 import ApplicantLayout from "@/components/layout/applicant-layout";
 import { ReactElement } from "react";
+import {
+  useAppControllerGetHello,
+  useAppControllerGetHelloHook,
+  useAuthControllerGoogleAuth,
+} from "@/api/generated";
 
 export default function Home() {
+  const d = useAppControllerGetHello();
+
+  const m = useAuthControllerGoogleAuth();
+  console.log("hello", d);
   return (
     <div className="rounded-2xl bg-white p-4 flex flex-col justify-center gap-4 items-center min-h-[200px]">
       <p className="text-xl font-bold text-center">
@@ -12,7 +21,15 @@ export default function Home() {
         Go ahead! Complete your profile. Search for an expert and schedule a
         one-on-one interview session
       </div>
-      <Button>Schedule Interview</Button>
+      <Button
+        onClick={() => {
+          m.mutateAsync().then((res) => {
+            console.log("res", res);
+          });
+        }}
+      >
+        Schedule Interview
+      </Button>
     </div>
   );
 }

@@ -228,7 +228,7 @@ export default function Home() {
             <UserCheck2Icon />
             <div className="flex flex-col">
               <p className="text-xl">80%</p>
-              <p>Interview Success</p>
+              <p>Success Rate</p>
             </div>
           </div>{" "}
           <div className="bg-slate-100 flex items-center gap-4 px-4 py-2 rounded-lg">
