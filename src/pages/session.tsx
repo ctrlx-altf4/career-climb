@@ -99,10 +99,6 @@ export default function Home() {
             <div className="w-1 h-[20px] bg-indigo-500 rounded" />
             <p className="text-lg font-medium text-center">Interview History</p>
           </div>
-          {/*<Button variant="outline" className="gap-2">*/}
-          {/*  <PenIcon size={12} />*/}
-          {/*  Edit*/}
-          {/*</Button>*/}
         </div>
         <div className="flex flex-col mt-4">
           <DataTable columns={columns} data={data} />

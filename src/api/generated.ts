@@ -15,7 +15,99 @@ import type {
   QueryKey,
 } from "@tanstack/react-query";
 import { useAxios } from "./useAxios";
-import type { ErrorType } from "./useAxios";
+import type { ErrorType, BodyType } from "./useAxios";
+export interface UpdateSkillDto {
+  skill_name?: string;
+  user_id?: number;
+  skill_experience?: number;
+}
+
+export interface UserSkillResponse {
+  skill_id: number;
+  skill_name: string;
+  skill_experience: string;
+}
+
+export interface AllSkillResponse {
+  skill_id: number;
+  skill_name: string;
+}
+
+export interface CreateSkillDto {
+  skill_name: string;
+  user_id: number;
+  skill_experience: number;
+}
+
+export interface UpdateInterviewerDto {
+  experience?: number;
+  interview_count?: number;
+  dob?: string;
+  address?: string;
+  phone?: string;
+  current_company?: string;
+  price?: number;
+  rating?: number;
+  user_id?: number;
+}
+
+export interface InterviewerProfileResponse {
+  dob: string;
+  address: string;
+  phone: string;
+  price: number;
+}
+
+export interface CreateInterviewerDto {
+  experience: number;
+  interview_count: number;
+  dob: string;
+  address: string;
+  phone: string;
+  current_company: string;
+  price: number;
+  rating: number;
+  user_id: number;
+}
+
+export interface PersonalProfileResponse {
+  dob: string;
+  address: string;
+  phone: string;
+}
+
+export interface SocialProfileResponse {
+  linkedin_url: string;
+  github_url: string;
+}
+
+export interface CreateApplicantDto {
+  experience: number;
+  interview_count: number;
+  dob: string;
+  address: string;
+  phone: string;
+  current_company: string;
+  linkedin_url: string;
+  github_url: string;
+  rating: number;
+  user_id: number;
+}
+
+export interface CreateScheduleDto {
+  availability_date: string;
+  availability_time: number;
+  status: boolean;
+  interviewer_id: number;
+}
+
+export interface User {
+  [key: string]: any;
+}
+
+export interface UpdateUserRoleDto {
+  role: string;
+}
 
 export const useAppControllerGetHelloHook = () => {
   const appControllerGetHello = useAxios<void>();
@@ -80,66 +172,204 @@ export const useAppControllerGetHello = <
   return query;
 };
 
-export const useAuthControllerGoogleAuthHook = () => {
-  const authControllerGoogleAuth = useAxios<void>();
+export const useUserControllerChangeUserRoleHook = () => {
+  const userControllerChangeUserRole = useAxios<void>();
 
-  return () => {
-    return authControllerGoogleAuth({ url: `/google`, method: "post" });
+  return (updateUserRoleDto: BodyType<UpdateUserRoleDto>) => {
+    return userControllerChangeUserRole({
+      url: `/user/change-role`,
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      data: updateUserRoleDto,
+    });
   };
 };
 
-export const useAuthControllerGoogleAuthMutationOptions = <
+export const useUserControllerChangeUserRoleMutationOptions = <
   TError = ErrorType<unknown>,
-  TVariables = void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<ReturnType<typeof useAuthControllerGoogleAuthHook>>>,
+    Awaited<ReturnType<ReturnType<typeof useUserControllerChangeUserRoleHook>>>,
     TError,
-    TVariables,
+    { data: BodyType<UpdateUserRoleDto> },
     TContext
   >;
 }): UseMutationOptions<
-  Awaited<ReturnType<ReturnType<typeof useAuthControllerGoogleAuthHook>>>,
+  Awaited<ReturnType<ReturnType<typeof useUserControllerChangeUserRoleHook>>>,
   TError,
-  TVariables,
+  { data: BodyType<UpdateUserRoleDto> },
   TContext
 > => {
   const { mutation: mutationOptions } = options ?? {};
 
-  const authControllerGoogleAuth = useAuthControllerGoogleAuthHook();
+  const userControllerChangeUserRole = useUserControllerChangeUserRoleHook();
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<ReturnType<typeof useAuthControllerGoogleAuthHook>>>,
-    TVariables
-  > = () => {
-    return authControllerGoogleAuth();
+    Awaited<ReturnType<ReturnType<typeof useUserControllerChangeUserRoleHook>>>,
+    { data: BodyType<UpdateUserRoleDto> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return userControllerChangeUserRole(data);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type AuthControllerGoogleAuthMutationResult = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof useAuthControllerGoogleAuthHook>>>
+export type UserControllerChangeUserRoleMutationResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useUserControllerChangeUserRoleHook>>>
 >;
+export type UserControllerChangeUserRoleMutationBody =
+  BodyType<UpdateUserRoleDto>;
+export type UserControllerChangeUserRoleMutationError = ErrorType<unknown>;
 
-export type AuthControllerGoogleAuthMutationError = ErrorType<unknown>;
-
-export const useAuthControllerGoogleAuth = <
+export const useUserControllerChangeUserRole = <
   TError = ErrorType<unknown>,
-  TVariables = void,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<ReturnType<typeof useAuthControllerGoogleAuthHook>>>,
+    Awaited<ReturnType<ReturnType<typeof useUserControllerChangeUserRoleHook>>>,
     TError,
-    TVariables,
+    { data: BodyType<UpdateUserRoleDto> },
     TContext
   >;
 }) => {
-  const mutationOptions = useAuthControllerGoogleAuthMutationOptions(options);
+  const mutationOptions =
+    useUserControllerChangeUserRoleMutationOptions(options);
 
   return useMutation(mutationOptions);
+};
+
+export const useUserControllerSelfHook = () => {
+  const userControllerSelf = useAxios<User>();
+
+  return (signal?: AbortSignal) => {
+    return userControllerSelf({ url: `/user/me`, method: "get", signal });
+  };
+};
+
+export const getUserControllerSelfQueryKey = () => [`/user/me`] as const;
+
+export const useUserControllerSelfQueryOptions = <
+  TData = Awaited<ReturnType<ReturnType<typeof useUserControllerSelfHook>>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<ReturnType<typeof useUserControllerSelfHook>>>,
+    TError,
+    TData
+  >;
+}): UseQueryOptions<
+  Awaited<ReturnType<ReturnType<typeof useUserControllerSelfHook>>>,
+  TError,
+  TData
+> & { queryKey: QueryKey } => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey = queryOptions?.queryKey ?? getUserControllerSelfQueryKey();
+
+  const userControllerSelf = useUserControllerSelfHook();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<ReturnType<typeof useUserControllerSelfHook>>>
+  > = ({ signal }) => userControllerSelf(signal);
+
+  return { queryKey, queryFn, ...queryOptions };
+};
+
+export type UserControllerSelfQueryResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useUserControllerSelfHook>>>
+>;
+export type UserControllerSelfQueryError = ErrorType<unknown>;
+
+export const useUserControllerSelf = <
+  TData = Awaited<ReturnType<ReturnType<typeof useUserControllerSelfHook>>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<ReturnType<typeof useUserControllerSelfHook>>>,
+    TError,
+    TData
+  >;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = useUserControllerSelfQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+};
+
+export const useAuthControllerGoogleAuthHook = () => {
+  const authControllerGoogleAuth = useAxios<void>();
+
+  return (signal?: AbortSignal) => {
+    return authControllerGoogleAuth({ url: `/google`, method: "get", signal });
+  };
+};
+
+export const getAuthControllerGoogleAuthQueryKey = () => [`/google`] as const;
+
+export const useAuthControllerGoogleAuthQueryOptions = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useAuthControllerGoogleAuthHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<ReturnType<typeof useAuthControllerGoogleAuthHook>>>,
+    TError,
+    TData
+  >;
+}): UseQueryOptions<
+  Awaited<ReturnType<ReturnType<typeof useAuthControllerGoogleAuthHook>>>,
+  TError,
+  TData
+> & { queryKey: QueryKey } => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getAuthControllerGoogleAuthQueryKey();
+
+  const authControllerGoogleAuth = useAuthControllerGoogleAuthHook();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<ReturnType<typeof useAuthControllerGoogleAuthHook>>>
+  > = ({ signal }) => authControllerGoogleAuth(signal);
+
+  return { queryKey, queryFn, ...queryOptions };
+};
+
+export type AuthControllerGoogleAuthQueryResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useAuthControllerGoogleAuthHook>>>
+>;
+export type AuthControllerGoogleAuthQueryError = ErrorType<unknown>;
+
+export const useAuthControllerGoogleAuth = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useAuthControllerGoogleAuthHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<ReturnType<typeof useAuthControllerGoogleAuthHook>>>,
+    TError,
+    TData
+  >;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = useAuthControllerGoogleAuthQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
 };
 
 export const useAuthControllerGoogleAuthRedirectHook = () => {
@@ -224,4 +454,1365 @@ export const useAuthControllerGoogleAuthRedirect = <
   query.queryKey = queryOptions.queryKey;
 
   return query;
+};
+
+export const useScheduleControllerCreateHook = () => {
+  const scheduleControllerCreate = useAxios<void>();
+
+  return (createScheduleDto: BodyType<CreateScheduleDto>) => {
+    return scheduleControllerCreate({
+      url: `/interviewer-availability`,
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      data: createScheduleDto,
+    });
+  };
+};
+
+export const useScheduleControllerCreateMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>,
+    TError,
+    { data: BodyType<CreateScheduleDto> },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>,
+  TError,
+  { data: BodyType<CreateScheduleDto> },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const scheduleControllerCreate = useScheduleControllerCreateHook();
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>,
+    { data: BodyType<CreateScheduleDto> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return scheduleControllerCreate(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ScheduleControllerCreateMutationResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>
+>;
+export type ScheduleControllerCreateMutationBody = BodyType<CreateScheduleDto>;
+export type ScheduleControllerCreateMutationError = ErrorType<unknown>;
+
+export const useScheduleControllerCreate = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>,
+    TError,
+    { data: BodyType<CreateScheduleDto> },
+    TContext
+  >;
+}) => {
+  const mutationOptions = useScheduleControllerCreateMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const useScheduleControllerFindAllHook = () => {
+  const scheduleControllerFindAll = useAxios<CreateScheduleDto[]>();
+
+  return (interviewerId: unknown, signal?: AbortSignal) => {
+    return scheduleControllerFindAll({
+      url: `/interviewer-availability/get-all-schedule/${interviewerId}`,
+      method: "get",
+      signal,
+    });
+  };
+};
+
+export const getScheduleControllerFindAllQueryKey = (interviewerId: unknown) =>
+  [`/interviewer-availability/get-all-schedule/${interviewerId}`] as const;
+
+export const useScheduleControllerFindAllQueryOptions = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  interviewerId: unknown,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>>,
+      TError,
+      TData
+    >;
+  },
+): UseQueryOptions<
+  Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>>,
+  TError,
+  TData
+> & { queryKey: QueryKey } => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getScheduleControllerFindAllQueryKey(interviewerId);
+
+  const scheduleControllerFindAll = useScheduleControllerFindAllHook();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>>
+  > = ({ signal }) => scheduleControllerFindAll(interviewerId, signal);
+
+  return { queryKey, queryFn, enabled: !!interviewerId, ...queryOptions };
+};
+
+export type ScheduleControllerFindAllQueryResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>>
+>;
+export type ScheduleControllerFindAllQueryError = ErrorType<unknown>;
+
+export const useScheduleControllerFindAll = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  interviewerId: unknown,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>>,
+      TError,
+      TData
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = useScheduleControllerFindAllQueryOptions(
+    interviewerId,
+    options,
+  );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+};
+
+export const useScheduleControllerFindOneHook = () => {
+  const scheduleControllerFindOne = useAxios<CreateScheduleDto>();
+
+  return (availabilityId: string, signal?: AbortSignal) => {
+    return scheduleControllerFindOne({
+      url: `/interviewer-availability/${availabilityId}`,
+      method: "get",
+      signal,
+    });
+  };
+};
+
+export const getScheduleControllerFindOneQueryKey = (availabilityId: string) =>
+  [`/interviewer-availability/${availabilityId}`] as const;
+
+export const useScheduleControllerFindOneQueryOptions = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  availabilityId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>>,
+      TError,
+      TData
+    >;
+  },
+): UseQueryOptions<
+  Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>>,
+  TError,
+  TData
+> & { queryKey: QueryKey } => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getScheduleControllerFindOneQueryKey(availabilityId);
+
+  const scheduleControllerFindOne = useScheduleControllerFindOneHook();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>>
+  > = ({ signal }) => scheduleControllerFindOne(availabilityId, signal);
+
+  return { queryKey, queryFn, enabled: !!availabilityId, ...queryOptions };
+};
+
+export type ScheduleControllerFindOneQueryResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>>
+>;
+export type ScheduleControllerFindOneQueryError = ErrorType<unknown>;
+
+export const useScheduleControllerFindOne = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  availabilityId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>>,
+      TError,
+      TData
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = useScheduleControllerFindOneQueryOptions(
+    availabilityId,
+    options,
+  );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+};
+
+export const useScheduleControllerRemoveHook = () => {
+  const scheduleControllerRemove = useAxios<void>();
+
+  return (availabilityId: string) => {
+    return scheduleControllerRemove({
+      url: `/interviewer-availability/${availabilityId}`,
+      method: "delete",
+    });
+  };
+};
+
+export const useScheduleControllerRemoveMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useScheduleControllerRemoveHook>>>,
+    TError,
+    { availabilityId: string },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<ReturnType<typeof useScheduleControllerRemoveHook>>>,
+  TError,
+  { availabilityId: string },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const scheduleControllerRemove = useScheduleControllerRemoveHook();
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<ReturnType<typeof useScheduleControllerRemoveHook>>>,
+    { availabilityId: string }
+  > = (props) => {
+    const { availabilityId } = props ?? {};
+
+    return scheduleControllerRemove(availabilityId);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ScheduleControllerRemoveMutationResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useScheduleControllerRemoveHook>>>
+>;
+
+export type ScheduleControllerRemoveMutationError = ErrorType<unknown>;
+
+export const useScheduleControllerRemove = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useScheduleControllerRemoveHook>>>,
+    TError,
+    { availabilityId: string },
+    TContext
+  >;
+}) => {
+  const mutationOptions = useScheduleControllerRemoveMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const useApplicantControllerCreateHook = () => {
+  const applicantControllerCreate = useAxios<void>();
+
+  return (createApplicantDto: BodyType<CreateApplicantDto>) => {
+    return applicantControllerCreate({
+      url: `/applicant-profile`,
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      data: createApplicantDto,
+    });
+  };
+};
+
+export const useApplicantControllerCreateMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useApplicantControllerCreateHook>>>,
+    TError,
+    { data: BodyType<CreateApplicantDto> },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<ReturnType<typeof useApplicantControllerCreateHook>>>,
+  TError,
+  { data: BodyType<CreateApplicantDto> },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const applicantControllerCreate = useApplicantControllerCreateHook();
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<ReturnType<typeof useApplicantControllerCreateHook>>>,
+    { data: BodyType<CreateApplicantDto> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return applicantControllerCreate(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ApplicantControllerCreateMutationResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useApplicantControllerCreateHook>>>
+>;
+export type ApplicantControllerCreateMutationBody =
+  BodyType<CreateApplicantDto>;
+export type ApplicantControllerCreateMutationError = ErrorType<unknown>;
+
+export const useApplicantControllerCreate = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useApplicantControllerCreateHook>>>,
+    TError,
+    { data: BodyType<CreateApplicantDto> },
+    TContext
+  >;
+}) => {
+  const mutationOptions = useApplicantControllerCreateMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const useApplicantControllerGetProfileHook = () => {
+  const applicantControllerGetProfile = useAxios<CreateApplicantDto>();
+
+  return (userId: string, signal?: AbortSignal) => {
+    return applicantControllerGetProfile({
+      url: `/applicant-profile/get-profile/${userId}`,
+      method: "get",
+      signal,
+    });
+  };
+};
+
+export const getApplicantControllerGetProfileQueryKey = (userId: string) =>
+  [`/applicant-profile/get-profile/${userId}`] as const;
+
+export const useApplicantControllerGetProfileQueryOptions = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useApplicantControllerGetProfileHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  userId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<
+        ReturnType<ReturnType<typeof useApplicantControllerGetProfileHook>>
+      >,
+      TError,
+      TData
+    >;
+  },
+): UseQueryOptions<
+  Awaited<ReturnType<ReturnType<typeof useApplicantControllerGetProfileHook>>>,
+  TError,
+  TData
+> & { queryKey: QueryKey } => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getApplicantControllerGetProfileQueryKey(userId);
+
+  const applicantControllerGetProfile = useApplicantControllerGetProfileHook();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<ReturnType<typeof useApplicantControllerGetProfileHook>>>
+  > = ({ signal }) => applicantControllerGetProfile(userId, signal);
+
+  return { queryKey, queryFn, enabled: !!userId, ...queryOptions };
+};
+
+export type ApplicantControllerGetProfileQueryResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useApplicantControllerGetProfileHook>>>
+>;
+export type ApplicantControllerGetProfileQueryError = ErrorType<unknown>;
+
+export const useApplicantControllerGetProfile = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useApplicantControllerGetProfileHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  userId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<
+        ReturnType<ReturnType<typeof useApplicantControllerGetProfileHook>>
+      >,
+      TError,
+      TData
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = useApplicantControllerGetProfileQueryOptions(
+    userId,
+    options,
+  );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+};
+
+export const useApplicantControllerGetSocialHook = () => {
+  const applicantControllerGetSocial = useAxios<SocialProfileResponse>();
+
+  return (userId: string, signal?: AbortSignal) => {
+    return applicantControllerGetSocial({
+      url: `/applicant-profile/get-social/${userId}`,
+      method: "get",
+      signal,
+    });
+  };
+};
+
+export const getApplicantControllerGetSocialQueryKey = (userId: string) =>
+  [`/applicant-profile/get-social/${userId}`] as const;
+
+export const useApplicantControllerGetSocialQueryOptions = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useApplicantControllerGetSocialHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  userId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<
+        ReturnType<ReturnType<typeof useApplicantControllerGetSocialHook>>
+      >,
+      TError,
+      TData
+    >;
+  },
+): UseQueryOptions<
+  Awaited<ReturnType<ReturnType<typeof useApplicantControllerGetSocialHook>>>,
+  TError,
+  TData
+> & { queryKey: QueryKey } => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getApplicantControllerGetSocialQueryKey(userId);
+
+  const applicantControllerGetSocial = useApplicantControllerGetSocialHook();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<ReturnType<typeof useApplicantControllerGetSocialHook>>>
+  > = ({ signal }) => applicantControllerGetSocial(userId, signal);
+
+  return { queryKey, queryFn, enabled: !!userId, ...queryOptions };
+};
+
+export type ApplicantControllerGetSocialQueryResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useApplicantControllerGetSocialHook>>>
+>;
+export type ApplicantControllerGetSocialQueryError = ErrorType<unknown>;
+
+export const useApplicantControllerGetSocial = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useApplicantControllerGetSocialHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  userId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<
+        ReturnType<ReturnType<typeof useApplicantControllerGetSocialHook>>
+      >,
+      TError,
+      TData
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = useApplicantControllerGetSocialQueryOptions(
+    userId,
+    options,
+  );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+};
+
+export const useApplicantControllerGetPersonalHook = () => {
+  const applicantControllerGetPersonal = useAxios<PersonalProfileResponse>();
+
+  return (userId: string, signal?: AbortSignal) => {
+    return applicantControllerGetPersonal({
+      url: `/applicant-profile/get-personal/${userId}`,
+      method: "get",
+      signal,
+    });
+  };
+};
+
+export const getApplicantControllerGetPersonalQueryKey = (userId: string) =>
+  [`/applicant-profile/get-personal/${userId}`] as const;
+
+export const useApplicantControllerGetPersonalQueryOptions = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useApplicantControllerGetPersonalHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  userId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<
+        ReturnType<ReturnType<typeof useApplicantControllerGetPersonalHook>>
+      >,
+      TError,
+      TData
+    >;
+  },
+): UseQueryOptions<
+  Awaited<ReturnType<ReturnType<typeof useApplicantControllerGetPersonalHook>>>,
+  TError,
+  TData
+> & { queryKey: QueryKey } => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getApplicantControllerGetPersonalQueryKey(userId);
+
+  const applicantControllerGetPersonal =
+    useApplicantControllerGetPersonalHook();
+
+  const queryFn: QueryFunction<
+    Awaited<
+      ReturnType<ReturnType<typeof useApplicantControllerGetPersonalHook>>
+    >
+  > = ({ signal }) => applicantControllerGetPersonal(userId, signal);
+
+  return { queryKey, queryFn, enabled: !!userId, ...queryOptions };
+};
+
+export type ApplicantControllerGetPersonalQueryResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useApplicantControllerGetPersonalHook>>>
+>;
+export type ApplicantControllerGetPersonalQueryError = ErrorType<unknown>;
+
+export const useApplicantControllerGetPersonal = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useApplicantControllerGetPersonalHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  userId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<
+        ReturnType<ReturnType<typeof useApplicantControllerGetPersonalHook>>
+      >,
+      TError,
+      TData
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = useApplicantControllerGetPersonalQueryOptions(
+    userId,
+    options,
+  );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+};
+
+export const useApplicantControllerUpdateHook = () => {
+  const applicantControllerUpdate = useAxios<void>();
+
+  return (userId: string, createApplicantDto: BodyType<CreateApplicantDto>) => {
+    return applicantControllerUpdate({
+      url: `/applicant-profile/${userId}`,
+      method: "patch",
+      headers: { "Content-Type": "application/json" },
+      data: createApplicantDto,
+    });
+  };
+};
+
+export const useApplicantControllerUpdateMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useApplicantControllerUpdateHook>>>,
+    TError,
+    { userId: string; data: BodyType<CreateApplicantDto> },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<ReturnType<typeof useApplicantControllerUpdateHook>>>,
+  TError,
+  { userId: string; data: BodyType<CreateApplicantDto> },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const applicantControllerUpdate = useApplicantControllerUpdateHook();
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<ReturnType<typeof useApplicantControllerUpdateHook>>>,
+    { userId: string; data: BodyType<CreateApplicantDto> }
+  > = (props) => {
+    const { userId, data } = props ?? {};
+
+    return applicantControllerUpdate(userId, data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ApplicantControllerUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useApplicantControllerUpdateHook>>>
+>;
+export type ApplicantControllerUpdateMutationBody =
+  BodyType<CreateApplicantDto>;
+export type ApplicantControllerUpdateMutationError = ErrorType<unknown>;
+
+export const useApplicantControllerUpdate = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useApplicantControllerUpdateHook>>>,
+    TError,
+    { userId: string; data: BodyType<CreateApplicantDto> },
+    TContext
+  >;
+}) => {
+  const mutationOptions = useApplicantControllerUpdateMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const useInterviewerControllerCreateHook = () => {
+  const interviewerControllerCreate = useAxios<void>();
+
+  return (createInterviewerDto: BodyType<CreateInterviewerDto>) => {
+    return interviewerControllerCreate({
+      url: `/interviewer-profile`,
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      data: createInterviewerDto,
+    });
+  };
+};
+
+export const useInterviewerControllerCreateMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useInterviewerControllerCreateHook>>>,
+    TError,
+    { data: BodyType<CreateInterviewerDto> },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<ReturnType<typeof useInterviewerControllerCreateHook>>>,
+  TError,
+  { data: BodyType<CreateInterviewerDto> },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const interviewerControllerCreate = useInterviewerControllerCreateHook();
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<ReturnType<typeof useInterviewerControllerCreateHook>>>,
+    { data: BodyType<CreateInterviewerDto> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return interviewerControllerCreate(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type InterviewerControllerCreateMutationResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useInterviewerControllerCreateHook>>>
+>;
+export type InterviewerControllerCreateMutationBody =
+  BodyType<CreateInterviewerDto>;
+export type InterviewerControllerCreateMutationError = ErrorType<unknown>;
+
+export const useInterviewerControllerCreate = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useInterviewerControllerCreateHook>>>,
+    TError,
+    { data: BodyType<CreateInterviewerDto> },
+    TContext
+  >;
+}) => {
+  const mutationOptions =
+    useInterviewerControllerCreateMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const useInterviewerControllerGetProfileHook = () => {
+  const interviewerControllerGetProfile = useAxios<CreateInterviewerDto>();
+
+  return (userId: string, signal?: AbortSignal) => {
+    return interviewerControllerGetProfile({
+      url: `/interviewer-profile/get-profile/${userId}`,
+      method: "get",
+      signal,
+    });
+  };
+};
+
+export const getInterviewerControllerGetProfileQueryKey = (userId: string) =>
+  [`/interviewer-profile/get-profile/${userId}`] as const;
+
+export const useInterviewerControllerGetProfileQueryOptions = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useInterviewerControllerGetProfileHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  userId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<
+        ReturnType<ReturnType<typeof useInterviewerControllerGetProfileHook>>
+      >,
+      TError,
+      TData
+    >;
+  },
+): UseQueryOptions<
+  Awaited<
+    ReturnType<ReturnType<typeof useInterviewerControllerGetProfileHook>>
+  >,
+  TError,
+  TData
+> & { queryKey: QueryKey } => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getInterviewerControllerGetProfileQueryKey(userId);
+
+  const interviewerControllerGetProfile =
+    useInterviewerControllerGetProfileHook();
+
+  const queryFn: QueryFunction<
+    Awaited<
+      ReturnType<ReturnType<typeof useInterviewerControllerGetProfileHook>>
+    >
+  > = ({ signal }) => interviewerControllerGetProfile(userId, signal);
+
+  return { queryKey, queryFn, enabled: !!userId, ...queryOptions };
+};
+
+export type InterviewerControllerGetProfileQueryResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useInterviewerControllerGetProfileHook>>>
+>;
+export type InterviewerControllerGetProfileQueryError = ErrorType<unknown>;
+
+export const useInterviewerControllerGetProfile = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useInterviewerControllerGetProfileHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  userId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<
+        ReturnType<ReturnType<typeof useInterviewerControllerGetProfileHook>>
+      >,
+      TError,
+      TData
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = useInterviewerControllerGetProfileQueryOptions(
+    userId,
+    options,
+  );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+};
+
+export const useInterviewerControllerGetPersonalHook = () => {
+  const interviewerControllerGetPersonal =
+    useAxios<InterviewerProfileResponse>();
+
+  return (userId: string, signal?: AbortSignal) => {
+    return interviewerControllerGetPersonal({
+      url: `/interviewer-profile/get-personal/${userId}`,
+      method: "get",
+      signal,
+    });
+  };
+};
+
+export const getInterviewerControllerGetPersonalQueryKey = (userId: string) =>
+  [`/interviewer-profile/get-personal/${userId}`] as const;
+
+export const useInterviewerControllerGetPersonalQueryOptions = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useInterviewerControllerGetPersonalHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  userId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<
+        ReturnType<ReturnType<typeof useInterviewerControllerGetPersonalHook>>
+      >,
+      TError,
+      TData
+    >;
+  },
+): UseQueryOptions<
+  Awaited<
+    ReturnType<ReturnType<typeof useInterviewerControllerGetPersonalHook>>
+  >,
+  TError,
+  TData
+> & { queryKey: QueryKey } => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getInterviewerControllerGetPersonalQueryKey(userId);
+
+  const interviewerControllerGetPersonal =
+    useInterviewerControllerGetPersonalHook();
+
+  const queryFn: QueryFunction<
+    Awaited<
+      ReturnType<ReturnType<typeof useInterviewerControllerGetPersonalHook>>
+    >
+  > = ({ signal }) => interviewerControllerGetPersonal(userId, signal);
+
+  return { queryKey, queryFn, enabled: !!userId, ...queryOptions };
+};
+
+export type InterviewerControllerGetPersonalQueryResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof useInterviewerControllerGetPersonalHook>>
+  >
+>;
+export type InterviewerControllerGetPersonalQueryError = ErrorType<unknown>;
+
+export const useInterviewerControllerGetPersonal = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useInterviewerControllerGetPersonalHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  userId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<
+        ReturnType<ReturnType<typeof useInterviewerControllerGetPersonalHook>>
+      >,
+      TError,
+      TData
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = useInterviewerControllerGetPersonalQueryOptions(
+    userId,
+    options,
+  );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+};
+
+export const useInterviewerControllerUpdateHook = () => {
+  const interviewerControllerUpdate = useAxios<void>();
+
+  return (
+    userId: string,
+    updateInterviewerDto: BodyType<UpdateInterviewerDto>,
+  ) => {
+    return interviewerControllerUpdate({
+      url: `/interviewer-profile/${userId}`,
+      method: "patch",
+      headers: { "Content-Type": "application/json" },
+      data: updateInterviewerDto,
+    });
+  };
+};
+
+export const useInterviewerControllerUpdateMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useInterviewerControllerUpdateHook>>>,
+    TError,
+    { userId: string; data: BodyType<UpdateInterviewerDto> },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<ReturnType<typeof useInterviewerControllerUpdateHook>>>,
+  TError,
+  { userId: string; data: BodyType<UpdateInterviewerDto> },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const interviewerControllerUpdate = useInterviewerControllerUpdateHook();
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<ReturnType<typeof useInterviewerControllerUpdateHook>>>,
+    { userId: string; data: BodyType<UpdateInterviewerDto> }
+  > = (props) => {
+    const { userId, data } = props ?? {};
+
+    return interviewerControllerUpdate(userId, data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type InterviewerControllerUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useInterviewerControllerUpdateHook>>>
+>;
+export type InterviewerControllerUpdateMutationBody =
+  BodyType<UpdateInterviewerDto>;
+export type InterviewerControllerUpdateMutationError = ErrorType<unknown>;
+
+export const useInterviewerControllerUpdate = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useInterviewerControllerUpdateHook>>>,
+    TError,
+    { userId: string; data: BodyType<UpdateInterviewerDto> },
+    TContext
+  >;
+}) => {
+  const mutationOptions =
+    useInterviewerControllerUpdateMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const useSkillControllerCreateHook = () => {
+  const skillControllerCreate = useAxios<void>();
+
+  return (createSkillDto: BodyType<CreateSkillDto>) => {
+    return skillControllerCreate({
+      url: `/skill`,
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      data: createSkillDto,
+    });
+  };
+};
+
+export const useSkillControllerCreateMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useSkillControllerCreateHook>>>,
+    TError,
+    { data: BodyType<CreateSkillDto> },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<ReturnType<typeof useSkillControllerCreateHook>>>,
+  TError,
+  { data: BodyType<CreateSkillDto> },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const skillControllerCreate = useSkillControllerCreateHook();
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<ReturnType<typeof useSkillControllerCreateHook>>>,
+    { data: BodyType<CreateSkillDto> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return skillControllerCreate(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SkillControllerCreateMutationResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useSkillControllerCreateHook>>>
+>;
+export type SkillControllerCreateMutationBody = BodyType<CreateSkillDto>;
+export type SkillControllerCreateMutationError = ErrorType<unknown>;
+
+export const useSkillControllerCreate = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useSkillControllerCreateHook>>>,
+    TError,
+    { data: BodyType<CreateSkillDto> },
+    TContext
+  >;
+}) => {
+  const mutationOptions = useSkillControllerCreateMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const useSkillControllerFindAllHook = () => {
+  const skillControllerFindAll = useAxios<AllSkillResponse[]>();
+
+  return (signal?: AbortSignal) => {
+    return skillControllerFindAll({ url: `/skill`, method: "get", signal });
+  };
+};
+
+export const getSkillControllerFindAllQueryKey = () => [`/skill`] as const;
+
+export const useSkillControllerFindAllQueryOptions = <
+  TData = Awaited<ReturnType<ReturnType<typeof useSkillControllerFindAllHook>>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<ReturnType<typeof useSkillControllerFindAllHook>>>,
+    TError,
+    TData
+  >;
+}): UseQueryOptions<
+  Awaited<ReturnType<ReturnType<typeof useSkillControllerFindAllHook>>>,
+  TError,
+  TData
+> & { queryKey: QueryKey } => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getSkillControllerFindAllQueryKey();
+
+  const skillControllerFindAll = useSkillControllerFindAllHook();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<ReturnType<typeof useSkillControllerFindAllHook>>>
+  > = ({ signal }) => skillControllerFindAll(signal);
+
+  return { queryKey, queryFn, ...queryOptions };
+};
+
+export type SkillControllerFindAllQueryResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useSkillControllerFindAllHook>>>
+>;
+export type SkillControllerFindAllQueryError = ErrorType<unknown>;
+
+export const useSkillControllerFindAll = <
+  TData = Awaited<ReturnType<ReturnType<typeof useSkillControllerFindAllHook>>>,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<ReturnType<ReturnType<typeof useSkillControllerFindAllHook>>>,
+    TError,
+    TData
+  >;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = useSkillControllerFindAllQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+};
+
+export const useSkillControllerFindOneHook = () => {
+  const skillControllerFindOne = useAxios<UserSkillResponse[]>();
+
+  return (userId: string, signal?: AbortSignal) => {
+    return skillControllerFindOne({
+      url: `/skill/find-skill-of-user/${userId}`,
+      method: "get",
+      signal,
+    });
+  };
+};
+
+export const getSkillControllerFindOneQueryKey = (userId: string) =>
+  [`/skill/find-skill-of-user/${userId}`] as const;
+
+export const useSkillControllerFindOneQueryOptions = <
+  TData = Awaited<ReturnType<ReturnType<typeof useSkillControllerFindOneHook>>>,
+  TError = ErrorType<unknown>,
+>(
+  userId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<ReturnType<typeof useSkillControllerFindOneHook>>>,
+      TError,
+      TData
+    >;
+  },
+): UseQueryOptions<
+  Awaited<ReturnType<ReturnType<typeof useSkillControllerFindOneHook>>>,
+  TError,
+  TData
+> & { queryKey: QueryKey } => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ?? getSkillControllerFindOneQueryKey(userId);
+
+  const skillControllerFindOne = useSkillControllerFindOneHook();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<ReturnType<typeof useSkillControllerFindOneHook>>>
+  > = ({ signal }) => skillControllerFindOne(userId, signal);
+
+  return { queryKey, queryFn, enabled: !!userId, ...queryOptions };
+};
+
+export type SkillControllerFindOneQueryResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useSkillControllerFindOneHook>>>
+>;
+export type SkillControllerFindOneQueryError = ErrorType<unknown>;
+
+export const useSkillControllerFindOne = <
+  TData = Awaited<ReturnType<ReturnType<typeof useSkillControllerFindOneHook>>>,
+  TError = ErrorType<unknown>,
+>(
+  userId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<ReturnType<typeof useSkillControllerFindOneHook>>>,
+      TError,
+      TData
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = useSkillControllerFindOneQueryOptions(userId, options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+};
+
+export const useSkillControllerUpdateHook = () => {
+  const skillControllerUpdate = useAxios<void>();
+
+  return (skillId: string, updateSkillDto: BodyType<UpdateSkillDto>) => {
+    return skillControllerUpdate({
+      url: `/skill/${skillId}`,
+      method: "patch",
+      headers: { "Content-Type": "application/json" },
+      data: updateSkillDto,
+    });
+  };
+};
+
+export const useSkillControllerUpdateMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useSkillControllerUpdateHook>>>,
+    TError,
+    { skillId: string; data: BodyType<UpdateSkillDto> },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<ReturnType<typeof useSkillControllerUpdateHook>>>,
+  TError,
+  { skillId: string; data: BodyType<UpdateSkillDto> },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const skillControllerUpdate = useSkillControllerUpdateHook();
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<ReturnType<typeof useSkillControllerUpdateHook>>>,
+    { skillId: string; data: BodyType<UpdateSkillDto> }
+  > = (props) => {
+    const { skillId, data } = props ?? {};
+
+    return skillControllerUpdate(skillId, data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SkillControllerUpdateMutationResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useSkillControllerUpdateHook>>>
+>;
+export type SkillControllerUpdateMutationBody = BodyType<UpdateSkillDto>;
+export type SkillControllerUpdateMutationError = ErrorType<unknown>;
+
+export const useSkillControllerUpdate = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useSkillControllerUpdateHook>>>,
+    TError,
+    { skillId: string; data: BodyType<UpdateSkillDto> },
+    TContext
+  >;
+}) => {
+  const mutationOptions = useSkillControllerUpdateMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const useSkillControllerRemoveHook = () => {
+  const skillControllerRemove = useAxios<void>();
+
+  return (userId: string, skillId: string) => {
+    return skillControllerRemove({
+      url: `/skill/${userId}/${skillId}`,
+      method: "delete",
+    });
+  };
+};
+
+export const useSkillControllerRemoveMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useSkillControllerRemoveHook>>>,
+    TError,
+    { userId: string; skillId: string },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<ReturnType<typeof useSkillControllerRemoveHook>>>,
+  TError,
+  { userId: string; skillId: string },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const skillControllerRemove = useSkillControllerRemoveHook();
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<ReturnType<typeof useSkillControllerRemoveHook>>>,
+    { userId: string; skillId: string }
+  > = (props) => {
+    const { userId, skillId } = props ?? {};
+
+    return skillControllerRemove(userId, skillId);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type SkillControllerRemoveMutationResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useSkillControllerRemoveHook>>>
+>;
+
+export type SkillControllerRemoveMutationError = ErrorType<unknown>;
+
+export const useSkillControllerRemove = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useSkillControllerRemoveHook>>>,
+    TError,
+    { userId: string; skillId: string },
+    TContext
+  >;
+}) => {
+  const mutationOptions = useSkillControllerRemoveMutationOptions(options);
+
+  return useMutation(mutationOptions);
 };

@@ -83,3 +83,39 @@ body {
 
     /*  rgb(var(--background-start-rgb));*/
 }
+
+
+
+
+/* Container for the spinner and image */
+.spinner-container {
+    position: relative;
+    display: inline-block; /* Make it inline so it wraps around the image */
+}
+
+/* Image styles */
+.spinner-container img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Spinner styles */
+.spinner-container::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    border: 4px solid rgba(0, 0, 0, 0.3); /* Border style for the spinner */
+    border-top: 4px solid #007bff; /* Color of the spinner */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite; /* Spin animation */
+}
+
+/* Spin animation keyframes */
+@keyframes spin {
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
+}

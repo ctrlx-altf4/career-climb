@@ -1,4 +1,6 @@
+"use client";
 import axios from "axios";
+import useAuthStore from "@/lib/store/auth";
 // import useAuthStore from 'context/auth';
 
 const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
@@ -13,12 +15,12 @@ type CustomClient<T> = (data: {
 }) => Promise<T>;
 
 export const useAxios = <T>(): CustomClient<T> => {
-  // const token = useAuthStore((state) => state.auth.accessToken);
-  const token = null;
+  // (localStorage && localStorage?.getItem("accessToken"));
 
   return async ({ url, method, params, data, headers }) => {
+    const token = localStorage.getItem("accessToken");
     const authHeaders = token
-      ? { ...headers, Authorization: token }
+      ? { ...headers, Authorization: `Bearer ${token}` }
       : { ...headers };
 
     const fetchUrl = `${baseURL}${url}`;

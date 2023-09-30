@@ -9,6 +9,11 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import useAuthStore from "@/lib/store/auth";
+import { useEffect } from "react";
+import { useUserControllerSelf } from "@/api/generated";
+import Image from "next/image";
+import ApplicantProfileForm from "@/components/pages/applicant/applicant-profile-form";
 
 const routes = [
   {
@@ -40,6 +45,8 @@ const routes = [
 
 function Sidebar() {
   const router = useRouter();
+  const { data: me } = useUserControllerSelf();
+
   return (
     <div className="hidden lg:flex flex-col w-[280px] text-slate-800 h-screen shadow z-20 ">
       <div className="flex h-20 items-center justify-center">
@@ -68,51 +75,112 @@ function Sidebar() {
       <div className="flex-1" />
       <div className="px-4 py-2 flex gap-2 items-center cursor-pointer">
         <Avatar className="w-8 h-8">
-          <AvatarImage src="/images/profile.png" />
-          <AvatarFallback>PP</AvatarFallback>
+          <AvatarImage src={me.image_url} />
+          <AvatarFallback>
+            {me.name
+              .split(" ")
+              ?.map((m) => m[0])
+              .join("")}
+          </AvatarFallback>
         </Avatar>
         <div className="overflow-hidden flex-1">
-          <p>Prajwal Pradhan</p>
-          <p className="text-sm truncate text-gray-500">prajwal@ramailo.tech</p>
+          <p>{me.name}</p>
+          <p className="text-sm truncate text-gray-500">{me.email}</p>
         </div>
         <LogOutIcon size={18} />
       </div>
     </div>
   );
 }
+
 export default function ApplicantLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div className={`h-screen overflow-hidden`}>
-      <div className="flex overflow-y-hidden">
-        <Sidebar />
-        <main className="flex-1 h-screen overflow-y-scroll">
-          <header className=" w-full px-4 py-4 sticky top-0 bg-[#F1F1F188] z-10 backdrop-blur-md">
-            <div className="flex flex-1 justify-between ">
-              <div className="flex flex-col gap-4">
-                <h1 className="text-xl font-semibold">
-                  Welcome back, Prajwal!!
-                </h1>
-                <p className="text-xs max-w-lg text-gray-500">
-                  Join your next session, know what task to work on, get a total
-                  overview of your goals and progress, all from here!
-                </p>
-              </div>
-              <div className="flex">
-                <Avatar>
-                  <AvatarImage src="/images/profile.png" />
-                  <AvatarFallback>PP</AvatarFallback>
-                </Avatar>
-              </div>
-            </div>
-          </header>
+  const router = useRouter();
 
-          <section className="px-4 py-4">{children}</section>
-        </main>
+  const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+
+  const { data: me, isLoading } = useUserControllerSelf();
+
+  console.log("me", me);
+  useEffect(() => {
+    //TODO: something when isLoggedIn ===null
+    if (isLoggedIn === false) {
+      void router.replace("/");
+    }
+  }, [isLoggedIn, router]);
+
+  if (isLoading) {
+    return (
+      <div className="h-screen w-screen flex flex-col  items-center justify-center">
+        <div className="spinner-container">
+          <Image
+            src="/images/profile.png"
+            width={28}
+            height={28}
+            alt="Google icon"
+          />
+        </div>
+        <div className="mt-8 flex flex-col gap-1 justify-center text-center">
+          <p>Successfully Logged in</p>
+          <p>Now Redirecting to home page</p>
+        </div>
       </div>
-    </div>
-  );
+    );
+  }
+  if (!me.hasProfile) {
+    return (
+      <div className="bg-gradient-to-t from-transparent to-indigo-400 h-screen w-screen flex items-center justify-center">
+        <div className=" max-w-lg bg-white shadow px-4  rounded-lg mx-auto py-5">
+          <h1 className="text-lg font-medium ">Please Complete Your Profile</h1>
+          <span className="text-xs text-slate-700">
+            Completing your profile helps us evaluate your need. You can then
+            explore the experts based on your experience
+          </span>
+          <div className="mt-4">
+            <ApplicantProfileForm />
+          </div>
+        </div>
+      </div>
+    );
+  }
+  if (isLoggedIn)
+    return (
+      <div className={`h-screen overflow-hidden`}>
+        <div className="flex overflow-y-hidden">
+          <Sidebar />
+          <main className="flex-1 h-screen overflow-y-scroll">
+            <header className=" w-full px-4 py-4 sticky top-0 bg-[#F1F1F188] z-10 backdrop-blur-md">
+              <div className="flex flex-1 justify-between ">
+                <div className="flex flex-col gap-4">
+                  <h1 className="text-xl font-semibold">
+                    Welcome back, {me?.name}!!
+                  </h1>
+                  <p className="text-xs max-w-lg text-gray-500">
+                    Join your next session, know what task to work on, get a
+                    total overview of your goals and progress, all from here!
+                  </p>
+                </div>
+                <div className="flex">
+                  <Avatar>
+                    <AvatarImage src={me.image_url} />
+                    <AvatarFallback>
+                      {" "}
+                      {me.name
+                        .split(" ")
+                        ?.map((m) => m[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                </div>
+              </div>
+            </header>
+
+            <section className="px-4 py-4">{children}</section>
+          </main>
+        </div>
+      </div>
+    );
 }

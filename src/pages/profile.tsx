@@ -27,6 +27,12 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import {
+  useApplicantControllerGetPersonal,
+  useApplicantControllerGetProfile,
+  useSkillControllerFindAll,
+  useUserControllerSelf,
+} from "@/api/generated";
 const formSchema = z.object({
   githubUrl: z.string(),
   linkedUrl: z.string(),
@@ -162,6 +168,14 @@ const data = [
   },
 ];
 export default function Home() {
+  const { data: me } = useUserControllerSelf();
+  const d = useApplicantControllerGetProfile(me.id as string);
+
+  console.log("profile data", d.data);
+
+  const skills = useSkillControllerFindAll();
+
+  console.log("skills", skills.data);
   return (
     <div className="flex flex-col gap-8">
       <div className="rounded-2xl bg-white p-4  gap-4  min-h-[200px]">
@@ -176,9 +190,9 @@ export default function Home() {
           </Button>
         </div>
         <div className="flex gap-4 mt-4">
-          <div className="relative  rounded-full overflow-hidden">
+          <div className=" rounded-full ">
             <Image
-              src="/images/profile.png"
+              src={me.image_url}
               alt="Profile"
               width={100}
               height={100}
@@ -187,8 +201,8 @@ export default function Home() {
             />
           </div>
           <div className="flex-1 flex flex-col">
-            <h1 className="text-lg font-semibold">Prajwal Pradhan</h1>
-            <div className="grid grid-cols-4 gap-4 mt-4">
+            <h1 className="text-lg font-semibold">{me.name}</h1>
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
               <div className="flex flex-col">
                 <p className="text-sm">Email</p>
                 <p>prajwal@ramailo.tech</p>
@@ -209,32 +223,32 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="grid grid-cols-4 mt-4 gap-4">
-          <div className="bg-slate-100 flex items-center gap-4 px-4 py-2 rounded-lg">
-            <MessageSquare />
+        <div className="grid grid-cols-2 sm:grid-cols-4 mt-4 gap-4">
+          <div className="bg-slate-100 flex items-center gap-2 md:gap-4 px-2 md:px-4 py-1 md:py-2 rounded-lg">
+            <MessageSquare className="w-5 h-5 md:w-6 md:h-6" />
             <div className="flex flex-col">
-              <p className="text-xl">500</p>
-              <p>Total Interviews</p>
+              <p className="text-lg md:text-xl">500</p>
+              <p>Interviews</p>
             </div>
           </div>{" "}
-          <div className="bg-slate-100 flex items-center gap-4 px-4 py-2 rounded-lg">
-            <StarIcon />
+          <div className="bg-slate-100 flex items-center gap-2 md:gap-4 px-2 md:px-4 py-1 md:py-2 rounded-lg">
+            <StarIcon className="w-5 h-5 md:w-6 md:h-6" />
             <div className="flex flex-col">
-              <p className="text-xl">5</p>
-              <p>Overall Rating</p>
+              <p className="text-lg md:text-xl">500</p>
+              <p>Avg. Rating</p>
             </div>
-          </div>{" "}
-          <div className="bg-slate-100 flex items-center gap-4 px-4 py-2 rounded-lg">
-            <UserCheck2Icon />
+          </div>
+          <div className="bg-slate-100 flex items-center gap-2 md:gap-4 px-2 md:px-4 py-1 md:py-2 rounded-lg">
+            <UserCheck2Icon className="w-5 h-5 md:w-6 md:h-6" />
             <div className="flex flex-col">
-              <p className="text-xl">80%</p>
+              <p className="text-lg md:text-xl">500</p>
               <p>Success Rate</p>
             </div>
-          </div>{" "}
-          <div className="bg-slate-100 flex items-center gap-4 px-4 py-2 rounded-lg">
-            <DollarSignIcon />
+          </div>
+          <div className="bg-slate-100 flex items-center gap-2 md:gap-4 px-2 md:px-4 py-1 md:py-2 rounded-lg">
+            <DollarSignIcon className="w-5 h-5 md:w-6 md:h-6" />
             <div className="flex flex-col">
-              <p className="text-xl">200</p>
+              <p className="text-lg md:text-xl">500</p>
               <p>Amount Spent</p>
             </div>
           </div>
