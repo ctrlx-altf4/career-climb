@@ -10,7 +10,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import useAuthStore from "@/lib/store/auth";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useUserControllerSelf } from "@/api/generated";
 import Image from "next/image";
 import ApplicantProfileForm from "@/components/pages/applicant/applicant-profile-form";
@@ -63,7 +63,7 @@ function Sidebar() {
         <div>LOGO</div>
       </div>
       <ul className="flex flex-col gap-2 ">
-        {routes.map((route, i) => {
+        {routes.map((route) => {
           const isActive = router.pathname === route.pathname;
           return (
             <Link
@@ -167,7 +167,7 @@ export default function ApplicantLayout({
       </div>
     );
   }
-  if (isLoggedIn)
+  if (isLoggedIn && me.role === "user")
     return (
       <div className={`h-screen overflow-hidden`}>
         <div className="flex overflow-y-hidden">

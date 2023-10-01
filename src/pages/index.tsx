@@ -20,6 +20,8 @@ import {
 } from "@/components/ui/dialog";
 import { useEffect, useState } from "react";
 import useAuthStore from "@/lib/store/auth";
+import { useUserControllerSelf } from "@/api/generated";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 const testimonials = [
   {
@@ -74,6 +76,13 @@ const Testimonials = () => {
 
 export default function Component() {
   const isLoggedIn = useAuthStore((state) => state.isLoggedIn);
+  const { data: me } = useUserControllerSelf({
+    query: {
+      enabled: !!isLoggedIn,
+    },
+  });
+
+  console.log("isLoggedIn", me);
   return (
     <div className="bg-gradient-to-t from-transparent to-indigo-400">
       <nav className="py-4  w-full ">
@@ -95,18 +104,32 @@ export default function Component() {
                 <DropdownMenuItem>About</DropdownMenuItem>
                 <DropdownMenuItem>Services</DropdownMenuItem>
                 <DropdownMenuItem>Contact</DropdownMenuItem>
+                <DropdownMenuItem>
+                  {!!me ? (
+                    <div className="flex items-center gap-2">
+                      <Avatar>
+                        <AvatarImage src={me.image_url} />
+                        <AvatarFallback>
+                          {" "}
+                          {me.name
+                            .split(" ")
+                            ?.map((m) => m[0])
+                            .join("")}
+                        </AvatarFallback>
+                      </Avatar>
+                      {me.name.split(" ")?.[0]}
+                    </div>
+                  ) : (
+                    "Login"
+                  )}
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
 
           {/* Desktop Menu */}
-          <div className={`hidden md:flex `}>
-            <ul className="md:flex space-x-4 mt-4 md:mt-0">
-              <li>
-                <a href="#" className="text-white hover:text-blue-400">
-                  Home
-                </a>
-              </li>
+          <div className={`hidden md:flex  `}>
+            <ul className="md:flex  items-center space-x-4 mt-4 md:mt-0">
               <li>
                 <a href="#" className="text-white hover:text-blue-400">
                   About
@@ -121,6 +144,30 @@ export default function Component() {
                 <a href="#" className="text-white hover:text-blue-400">
                   Contact
                 </a>
+              </li>
+              <li>
+                {!!me ? (
+                  <Link
+                    href={
+                      me.role === "interviewer"
+                        ? "/interviewer/dashboard"
+                        : "applicant/dashboard"
+                    }
+                  >
+                    <Avatar>
+                      <AvatarImage src={me.image_url} />
+                      <AvatarFallback>
+                        {" "}
+                        {me.name
+                          .split(" ")
+                          ?.map((m) => m[0])
+                          .join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                  </Link>
+                ) : (
+                  <JoinUs />
+                )}
               </li>
             </ul>
           </div>

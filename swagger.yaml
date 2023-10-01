@@ -686,6 +686,37 @@
         ]
       }
     },
+    "/interview/check-for-payment": {
+      "post": {
+        "operationId": "InterviewController_checkPayment",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckForPaymentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KhaltiResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interview"
+        ]
+      }
+    },
     "/interview/interviewer-interviews/{interviewer_id}": {
       "get": {
         "operationId": "InterviewController_getInterviewerInterview",
@@ -694,7 +725,9 @@
             "name": "interviewer_id",
             "required": true,
             "in": "path",
-            "schema": {}
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -747,6 +780,128 @@
         },
         "tags": [
           "interview"
+        ]
+      }
+    },
+    "/feedback/create-feedback-applicant": {
+      "post": {
+        "operationId": "FeedbackController_feedBackForApplicant",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFeedbackDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateFeedbackDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "feedback"
+        ]
+      }
+    },
+    "/feedback/create-feedback-interviewer": {
+      "post": {
+        "operationId": "FeedbackController_feedBackForInterviewer",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFeedbackInterviewerDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateFeedbackInterviewerDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "feedback"
+        ]
+      }
+    },
+    "/feedback/all-interviewer-feedback/{interviewer_id}": {
+      "get": {
+        "operationId": "FeedbackController_findFeedbackInterviewer",
+        "parameters": [
+          {
+            "name": "interviewer_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateFeedbackInterviewerDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "feedback"
+        ]
+      }
+    },
+    "/feedback/all-applicant-feedback/{applicant_id}": {
+      "get": {
+        "operationId": "FeedbackController_findFeedback",
+        "parameters": [
+          {
+            "name": "applicant_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateFeedbackDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "feedback"
         ]
       }
     }
@@ -1355,6 +1510,21 @@
           "expires_in"
         ]
       },
+      "CheckForPaymentDto": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "number"
+          },
+          "pidx": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "session_id",
+          "pidx"
+        ]
+      },
       "InterviewerResponse": {
         "type": "object",
         "properties": {
@@ -1363,6 +1533,9 @@
           },
           "interview_date": {
             "format": "date-time",
+            "type": "string"
+          },
+          "payment_id": {
             "type": "string"
           },
           "interview_time": {
@@ -1406,6 +1579,7 @@
         "required": [
           "session_id",
           "interview_date",
+          "payment_id",
           "interview_time",
           "interview_status",
           "interviewer_id",
@@ -1417,6 +1591,9 @@
         "properties": {
           "session_id": {
             "type": "number"
+          },
+          "payment_id": {
+            "type": "string"
           },
           "interview_date": {
             "format": "date-time",
@@ -1456,11 +1633,70 @@
         },
         "required": [
           "session_id",
+          "payment_id",
           "interview_date",
           "interview_time",
           "interview_status",
           "applicant_id",
           "interviewer"
+        ]
+      },
+      "CreateFeedbackDto": {
+        "type": "object",
+        "properties": {
+          "interview_id": {
+            "type": "number"
+          },
+          "performance_rating": {
+            "type": "number"
+          },
+          "knowledge_depth_rating": {
+            "type": "number"
+          },
+          "confidence_rating": {
+            "type": "number"
+          },
+          "communication_skill_rating": {
+            "type": "number"
+          },
+          "strength": {
+            "type": "string"
+          },
+          "area_of_improvements": {
+            "type": "string"
+          },
+          "suggestions": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "interview_id",
+          "performance_rating",
+          "knowledge_depth_rating",
+          "confidence_rating",
+          "communication_skill_rating",
+          "strength",
+          "area_of_improvements",
+          "suggestions"
+        ]
+      },
+      "CreateFeedbackInterviewerDto": {
+        "type": "object",
+        "properties": {
+          "interview_id": {
+            "type": "number"
+          },
+          "interviewer_rating": {
+            "type": "number"
+          },
+          "interviewer_remarks": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "interview_id",
+          "interviewer_rating",
+          "interviewer_remarks"
         ]
       }
     }

@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { formatTime } from "@/lib/utils";
 import Image from "next/image";
 import InterviewerLayout from "@/components/layout/interviewer-layout";
+import { Badge } from "@/components/ui/badge";
 
 const data = [
   {
@@ -68,6 +69,8 @@ export default function Session() {
     },
   );
 
+  console.log("interviews", interviews);
+
   return (
     <div className="flex flex-col gap-8">
       <div className="rounded-2xl bg-white p-4  gap-4  min-h-[200px]">
@@ -111,7 +114,13 @@ export default function Session() {
                   </p>
                   <p>{formatTime(interview.interview_time)}</p>
                 </div>
-                <div>{/**/}</div>
+                <div>
+                  {interview.payment_id === "COMPLETED" ? (
+                    <Badge className="bg-indigo-500">PAID</Badge>
+                  ) : (
+                    <Badge className="bg-slate-400">Pending</Badge>
+                  )}
+                </div>
               </div>
             );
           })}

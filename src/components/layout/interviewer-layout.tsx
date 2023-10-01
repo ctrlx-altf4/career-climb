@@ -168,7 +168,7 @@ export default function InterviewerLayout({
       </div>
     );
   }
-  if (isLoggedIn)
+  if (isLoggedIn && me.role === "interviewer")
     return (
       <div className={`h-screen overflow-hidden`}>
         <div className="flex overflow-y-hidden">

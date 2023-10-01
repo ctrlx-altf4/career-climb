@@ -16,6 +16,23 @@ import type {
 } from "@tanstack/react-query";
 import { useAxios } from "./useAxios";
 import type { ErrorType, BodyType } from "./useAxios";
+export interface CreateFeedbackInterviewerDto {
+  interview_id: number;
+  interviewer_rating: number;
+  interviewer_remarks: string;
+}
+
+export interface CreateFeedbackDto {
+  interview_id: number;
+  performance_rating: number;
+  knowledge_depth_rating: number;
+  confidence_rating: number;
+  communication_skill_rating: number;
+  strength: string;
+  area_of_improvements: string;
+  suggestions: string;
+}
+
 export type ApplicantResponseInterviewerUser = {
   name?: string;
   image_url?: string;
@@ -29,6 +46,7 @@ export type ApplicantResponseInterviewer = {
 
 export interface ApplicantResponse {
   session_id: number;
+  payment_id: string;
   interview_date: string;
   interview_time: number;
   interview_status: string;
@@ -52,10 +70,16 @@ export type InterviewerResponseApplicant = {
 export interface InterviewerResponse {
   session_id: number;
   interview_date: string;
+  payment_id: string;
   interview_time: number;
   interview_status: string;
   interviewer_id: number;
   applicant: InterviewerResponseApplicant;
+}
+
+export interface CheckForPaymentDto {
+  session_id: number;
+  pidx: string;
 }
 
 export interface KhaltiResponse {
@@ -2198,11 +2222,89 @@ export const useInterviewControllerPayForInterview = <
   return useMutation(mutationOptions);
 };
 
+export const useInterviewControllerCheckPaymentHook = () => {
+  const interviewControllerCheckPayment = useAxios<KhaltiResponse>();
+
+  return (checkForPaymentDto: BodyType<CheckForPaymentDto>) => {
+    return interviewControllerCheckPayment({
+      url: `/interview/check-for-payment`,
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      data: checkForPaymentDto,
+    });
+  };
+};
+
+export const useInterviewControllerCheckPaymentMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<
+      ReturnType<ReturnType<typeof useInterviewControllerCheckPaymentHook>>
+    >,
+    TError,
+    { data: BodyType<CheckForPaymentDto> },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<
+    ReturnType<ReturnType<typeof useInterviewControllerCheckPaymentHook>>
+  >,
+  TError,
+  { data: BodyType<CheckForPaymentDto> },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const interviewControllerCheckPayment =
+    useInterviewControllerCheckPaymentHook();
+
+  const mutationFn: MutationFunction<
+    Awaited<
+      ReturnType<ReturnType<typeof useInterviewControllerCheckPaymentHook>>
+    >,
+    { data: BodyType<CheckForPaymentDto> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return interviewControllerCheckPayment(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type InterviewControllerCheckPaymentMutationResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useInterviewControllerCheckPaymentHook>>>
+>;
+export type InterviewControllerCheckPaymentMutationBody =
+  BodyType<CheckForPaymentDto>;
+export type InterviewControllerCheckPaymentMutationError = ErrorType<unknown>;
+
+export const useInterviewControllerCheckPayment = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<
+      ReturnType<ReturnType<typeof useInterviewControllerCheckPaymentHook>>
+    >,
+    TError,
+    { data: BodyType<CheckForPaymentDto> },
+    TContext
+  >;
+}) => {
+  const mutationOptions =
+    useInterviewControllerCheckPaymentMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
 export const useInterviewControllerGetInterviewerInterviewHook = () => {
   const interviewControllerGetInterviewerInterview =
     useAxios<InterviewerResponse[]>();
 
-  return (interviewerId: unknown, signal?: AbortSignal) => {
+  return (interviewerId: string, signal?: AbortSignal) => {
     return interviewControllerGetInterviewerInterview({
       url: `/interview/interviewer-interviews/${interviewerId}`,
       method: "get",
@@ -2212,7 +2314,7 @@ export const useInterviewControllerGetInterviewerInterviewHook = () => {
 };
 
 export const getInterviewControllerGetInterviewerInterviewQueryKey = (
-  interviewerId: unknown,
+  interviewerId: string,
 ) => [`/interview/interviewer-interviews/${interviewerId}`] as const;
 
 export const useInterviewControllerGetInterviewerInterviewQueryOptions = <
@@ -2223,7 +2325,7 @@ export const useInterviewControllerGetInterviewerInterviewQueryOptions = <
   >,
   TError = ErrorType<unknown>,
 >(
-  interviewerId: unknown,
+  interviewerId: string,
   options?: {
     query?: UseQueryOptions<
       Awaited<
@@ -2283,7 +2385,7 @@ export const useInterviewControllerGetInterviewerInterview = <
   >,
   TError = ErrorType<unknown>,
 >(
-  interviewerId: unknown,
+  interviewerId: string,
   options?: {
     query?: UseQueryOptions<
       Awaited<
@@ -2410,6 +2512,391 @@ export const useInterviewControllerGetApplicantInterview = <
   },
 ): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
   const queryOptions = useInterviewControllerGetApplicantInterviewQueryOptions(
+    applicantId,
+    options,
+  );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+};
+
+export const useFeedbackControllerFeedBackForApplicantHook = () => {
+  const feedbackControllerFeedBackForApplicant = useAxios<CreateFeedbackDto>();
+
+  return (createFeedbackDto: BodyType<CreateFeedbackDto>) => {
+    return feedbackControllerFeedBackForApplicant({
+      url: `/feedback/create-feedback-applicant`,
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      data: createFeedbackDto,
+    });
+  };
+};
+
+export const useFeedbackControllerFeedBackForApplicantMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<
+      ReturnType<
+        ReturnType<typeof useFeedbackControllerFeedBackForApplicantHook>
+      >
+    >,
+    TError,
+    { data: BodyType<CreateFeedbackDto> },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<
+    ReturnType<ReturnType<typeof useFeedbackControllerFeedBackForApplicantHook>>
+  >,
+  TError,
+  { data: BodyType<CreateFeedbackDto> },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const feedbackControllerFeedBackForApplicant =
+    useFeedbackControllerFeedBackForApplicantHook();
+
+  const mutationFn: MutationFunction<
+    Awaited<
+      ReturnType<
+        ReturnType<typeof useFeedbackControllerFeedBackForApplicantHook>
+      >
+    >,
+    { data: BodyType<CreateFeedbackDto> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return feedbackControllerFeedBackForApplicant(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type FeedbackControllerFeedBackForApplicantMutationResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof useFeedbackControllerFeedBackForApplicantHook>>
+  >
+>;
+export type FeedbackControllerFeedBackForApplicantMutationBody =
+  BodyType<CreateFeedbackDto>;
+export type FeedbackControllerFeedBackForApplicantMutationError =
+  ErrorType<unknown>;
+
+export const useFeedbackControllerFeedBackForApplicant = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<
+      ReturnType<
+        ReturnType<typeof useFeedbackControllerFeedBackForApplicantHook>
+      >
+    >,
+    TError,
+    { data: BodyType<CreateFeedbackDto> },
+    TContext
+  >;
+}) => {
+  const mutationOptions =
+    useFeedbackControllerFeedBackForApplicantMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const useFeedbackControllerFeedBackForInterviewerHook = () => {
+  const feedbackControllerFeedBackForInterviewer =
+    useAxios<CreateFeedbackInterviewerDto>();
+
+  return (
+    createFeedbackInterviewerDto: BodyType<CreateFeedbackInterviewerDto>,
+  ) => {
+    return feedbackControllerFeedBackForInterviewer({
+      url: `/feedback/create-feedback-interviewer`,
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      data: createFeedbackInterviewerDto,
+    });
+  };
+};
+
+export const useFeedbackControllerFeedBackForInterviewerMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<
+      ReturnType<
+        ReturnType<typeof useFeedbackControllerFeedBackForInterviewerHook>
+      >
+    >,
+    TError,
+    { data: BodyType<CreateFeedbackInterviewerDto> },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<
+    ReturnType<
+      ReturnType<typeof useFeedbackControllerFeedBackForInterviewerHook>
+    >
+  >,
+  TError,
+  { data: BodyType<CreateFeedbackInterviewerDto> },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const feedbackControllerFeedBackForInterviewer =
+    useFeedbackControllerFeedBackForInterviewerHook();
+
+  const mutationFn: MutationFunction<
+    Awaited<
+      ReturnType<
+        ReturnType<typeof useFeedbackControllerFeedBackForInterviewerHook>
+      >
+    >,
+    { data: BodyType<CreateFeedbackInterviewerDto> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return feedbackControllerFeedBackForInterviewer(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type FeedbackControllerFeedBackForInterviewerMutationResult =
+  NonNullable<
+    Awaited<
+      ReturnType<
+        ReturnType<typeof useFeedbackControllerFeedBackForInterviewerHook>
+      >
+    >
+  >;
+export type FeedbackControllerFeedBackForInterviewerMutationBody =
+  BodyType<CreateFeedbackInterviewerDto>;
+export type FeedbackControllerFeedBackForInterviewerMutationError =
+  ErrorType<unknown>;
+
+export const useFeedbackControllerFeedBackForInterviewer = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<
+      ReturnType<
+        ReturnType<typeof useFeedbackControllerFeedBackForInterviewerHook>
+      >
+    >,
+    TError,
+    { data: BodyType<CreateFeedbackInterviewerDto> },
+    TContext
+  >;
+}) => {
+  const mutationOptions =
+    useFeedbackControllerFeedBackForInterviewerMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const useFeedbackControllerFindFeedbackInterviewerHook = () => {
+  const feedbackControllerFindFeedbackInterviewer =
+    useAxios<CreateFeedbackInterviewerDto>();
+
+  return (interviewerId: string, signal?: AbortSignal) => {
+    return feedbackControllerFindFeedbackInterviewer({
+      url: `/feedback/all-interviewer-feedback/${interviewerId}`,
+      method: "get",
+      signal,
+    });
+  };
+};
+
+export const getFeedbackControllerFindFeedbackInterviewerQueryKey = (
+  interviewerId: string,
+) => [`/feedback/all-interviewer-feedback/${interviewerId}`] as const;
+
+export const useFeedbackControllerFindFeedbackInterviewerQueryOptions = <
+  TData = Awaited<
+    ReturnType<
+      ReturnType<typeof useFeedbackControllerFindFeedbackInterviewerHook>
+    >
+  >,
+  TError = ErrorType<unknown>,
+>(
+  interviewerId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<
+        ReturnType<
+          ReturnType<typeof useFeedbackControllerFindFeedbackInterviewerHook>
+        >
+      >,
+      TError,
+      TData
+    >;
+  },
+): UseQueryOptions<
+  Awaited<
+    ReturnType<
+      ReturnType<typeof useFeedbackControllerFindFeedbackInterviewerHook>
+    >
+  >,
+  TError,
+  TData
+> & { queryKey: QueryKey } => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getFeedbackControllerFindFeedbackInterviewerQueryKey(interviewerId);
+
+  const feedbackControllerFindFeedbackInterviewer =
+    useFeedbackControllerFindFeedbackInterviewerHook();
+
+  const queryFn: QueryFunction<
+    Awaited<
+      ReturnType<
+        ReturnType<typeof useFeedbackControllerFindFeedbackInterviewerHook>
+      >
+    >
+  > = ({ signal }) =>
+    feedbackControllerFindFeedbackInterviewer(interviewerId, signal);
+
+  return { queryKey, queryFn, enabled: !!interviewerId, ...queryOptions };
+};
+
+export type FeedbackControllerFindFeedbackInterviewerQueryResult = NonNullable<
+  Awaited<
+    ReturnType<
+      ReturnType<typeof useFeedbackControllerFindFeedbackInterviewerHook>
+    >
+  >
+>;
+export type FeedbackControllerFindFeedbackInterviewerQueryError =
+  ErrorType<unknown>;
+
+export const useFeedbackControllerFindFeedbackInterviewer = <
+  TData = Awaited<
+    ReturnType<
+      ReturnType<typeof useFeedbackControllerFindFeedbackInterviewerHook>
+    >
+  >,
+  TError = ErrorType<unknown>,
+>(
+  interviewerId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<
+        ReturnType<
+          ReturnType<typeof useFeedbackControllerFindFeedbackInterviewerHook>
+        >
+      >,
+      TError,
+      TData
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = useFeedbackControllerFindFeedbackInterviewerQueryOptions(
+    interviewerId,
+    options,
+  );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+};
+
+export const useFeedbackControllerFindFeedbackHook = () => {
+  const feedbackControllerFindFeedback = useAxios<CreateFeedbackDto>();
+
+  return (applicantId: string, signal?: AbortSignal) => {
+    return feedbackControllerFindFeedback({
+      url: `/feedback/all-applicant-feedback/${applicantId}`,
+      method: "get",
+      signal,
+    });
+  };
+};
+
+export const getFeedbackControllerFindFeedbackQueryKey = (
+  applicantId: string,
+) => [`/feedback/all-applicant-feedback/${applicantId}`] as const;
+
+export const useFeedbackControllerFindFeedbackQueryOptions = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useFeedbackControllerFindFeedbackHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  applicantId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<
+        ReturnType<ReturnType<typeof useFeedbackControllerFindFeedbackHook>>
+      >,
+      TError,
+      TData
+    >;
+  },
+): UseQueryOptions<
+  Awaited<ReturnType<ReturnType<typeof useFeedbackControllerFindFeedbackHook>>>,
+  TError,
+  TData
+> & { queryKey: QueryKey } => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getFeedbackControllerFindFeedbackQueryKey(applicantId);
+
+  const feedbackControllerFindFeedback =
+    useFeedbackControllerFindFeedbackHook();
+
+  const queryFn: QueryFunction<
+    Awaited<
+      ReturnType<ReturnType<typeof useFeedbackControllerFindFeedbackHook>>
+    >
+  > = ({ signal }) => feedbackControllerFindFeedback(applicantId, signal);
+
+  return { queryKey, queryFn, enabled: !!applicantId, ...queryOptions };
+};
+
+export type FeedbackControllerFindFeedbackQueryResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useFeedbackControllerFindFeedbackHook>>>
+>;
+export type FeedbackControllerFindFeedbackQueryError = ErrorType<unknown>;
+
+export const useFeedbackControllerFindFeedback = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useFeedbackControllerFindFeedbackHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  applicantId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<
+        ReturnType<ReturnType<typeof useFeedbackControllerFindFeedbackHook>>
+      >,
+      TError,
+      TData
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = useFeedbackControllerFindFeedbackQueryOptions(
     applicantId,
     options,
   );

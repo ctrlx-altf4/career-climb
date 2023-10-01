@@ -124,7 +124,7 @@ function ApplicantProfileForm() {
                     <Input placeholder="+97798XXXXXXXX" {...field} />
                   </FormControl>
                   <FormDescription>
-                    Enter number with your country codes
+                    Enter number with your country code
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

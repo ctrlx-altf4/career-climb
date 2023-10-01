@@ -13,6 +13,7 @@ import { formatTime } from "@/lib/utils";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/router";
+import { Badge } from "@/components/ui/badge";
 
 const data = [
   {
@@ -110,27 +111,31 @@ export default function Session() {
                   <p>{formatTime(interview.interview_time)}</p>
                 </div>
                 <div>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      pay({
-                        data: {
-                          session_id: interview.session_id,
-                        },
-                      }).then((res) => {
-                        console.log("res", res);
-                        router.replace(res.payment_url);
-                      });
-                    }}
-                  >
-                    Pay With
-                    <Image
-                      src="/images/khalti.png"
-                      alt="Khalti Logo"
-                      width={30}
-                      height={30}
-                    />
-                  </Button>
+                  {interview.payment_id === "COMPLETED" ? (
+                    <Badge className="bg-indigo-500">PAID</Badge>
+                  ) : (
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        pay({
+                          data: {
+                            session_id: interview.session_id,
+                          },
+                        }).then((res) => {
+                          console.log("res", res);
+                          router.replace(res.payment_url);
+                        });
+                      }}
+                    >
+                      Pay With
+                      <Image
+                        src="/images/khalti.png"
+                        alt="Khalti Logo"
+                        width={30}
+                        height={30}
+                      />
+                    </Button>
+                  )}
                 </div>
               </div>
             );
