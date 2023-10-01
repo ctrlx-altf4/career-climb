@@ -412,7 +412,7 @@ function JoinUs() {
                 />
               </div>
               <p className="text-lg font-medium text-center text-slate-800">
-                As a Interviewer
+                As an Interviewer
               </p>
               <p className="text-center mt-4">
                 Get Paid to interview candidates as per your skills. You need to

@@ -5,6 +5,7 @@ interface AuthState {
   isLoggedIn: boolean | null;
   addToken: (token: string) => void;
   updateLoginState: (_state: boolean) => void;
+  logout: () => void;
 }
 
 const useAuthStore = create<AuthState>()((set) => ({
@@ -17,6 +18,10 @@ const useAuthStore = create<AuthState>()((set) => ({
   },
   updateLoginState: (_state) => {
     set((state) => ({ ...state, isLoggedIn: _state }));
+  },
+  logout: () => {
+    localStorage.clear();
+    set({ accessToken: null, isLoggedIn: false });
   },
 }));
 

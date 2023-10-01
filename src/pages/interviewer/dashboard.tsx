@@ -8,6 +8,7 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { generateHourlyTimeListWithObjects, TimeSlot } from "@/lib/utils";
 import { format } from "date-fns";
+import InterviewerLayout from "@/components/layout/interviewer-layout";
 export default function Home() {
   const d = useAppControllerGetHello();
 
@@ -81,5 +82,5 @@ export default function Home() {
 }
 
 Home.getLayout = function getLayout(page: ReactElement) {
-  return <ApplicantLayout>{page}</ApplicantLayout>;
+  return <InterviewerLayout>{page}</InterviewerLayout>;
 };

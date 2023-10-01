@@ -46,7 +46,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/SelfResponseDto"
                 }
               }
             }
@@ -82,112 +82,6 @@
         },
         "tags": [
           "auth"
-        ]
-      }
-    },
-    "/interviewer-availability": {
-      "post": {
-        "operationId": "ScheduleController_create",
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateScheduleDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "interviewer-availability"
-        ]
-      }
-    },
-    "/interviewer-availability/get-all-schedule/{interviewer_id}": {
-      "get": {
-        "operationId": "ScheduleController_findAll",
-        "parameters": [
-          {
-            "name": "interviewer_id",
-            "required": true,
-            "in": "path",
-            "schema": {}
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CreateScheduleDto"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "interviewer-availability"
-        ]
-      }
-    },
-    "/interviewer-availability/{availability_id}": {
-      "get": {
-        "operationId": "ScheduleController_findOne",
-        "parameters": [
-          {
-            "name": "availability_id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreateScheduleDto"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "interviewer-availability"
-        ]
-      },
-      "delete": {
-        "operationId": "ScheduleController_remove",
-        "parameters": [
-          {
-            "name": "availability_id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
-          }
-        },
-        "tags": [
-          "interviewer-availability"
         ]
       }
     },
@@ -362,6 +256,30 @@
         ]
       }
     },
+    "/interviewer-profile/get-all-interviewers": {
+      "get": {
+        "operationId": "InterviewerController_getAllInterviewers",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AllInterviewerResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interviewer-profile"
+        ]
+      }
+    },
     "/interviewer-profile/get-profile/{user_id}": {
       "get": {
         "operationId": "InterviewerController_getProfile",
@@ -452,6 +370,112 @@
         },
         "tags": [
           "interviewer-profile"
+        ]
+      }
+    },
+    "/interviewer-availability": {
+      "post": {
+        "operationId": "ScheduleController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateScheduleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "interviewer-availability"
+        ]
+      }
+    },
+    "/interviewer-availability/get-all-schedule/{interviewer_id}": {
+      "get": {
+        "operationId": "ScheduleController_findAll",
+        "parameters": [
+          {
+            "name": "interviewer_id",
+            "required": true,
+            "in": "path",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CreateScheduleDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interviewer-availability"
+        ]
+      }
+    },
+    "/interviewer-availability/{availability_id}": {
+      "get": {
+        "operationId": "ScheduleController_findOne",
+        "parameters": [
+          {
+            "name": "availability_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateScheduleDto"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interviewer-availability"
+        ]
+      },
+      "delete": {
+        "operationId": "ScheduleController_remove",
+        "parameters": [
+          {
+            "name": "availability_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "interviewer-availability"
         ]
       }
     },
@@ -604,6 +628,100 @@
           "skill"
         ]
       }
+    },
+    "/interview": {
+      "post": {
+        "operationId": "InterviewController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInterviewDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "tags": [
+          "interview"
+        ]
+      }
+    },
+    "/interview/interviewer-interviews/{interviewer_id}": {
+      "get": {
+        "operationId": "InterviewController_getInterviewerInterview",
+        "parameters": [
+          {
+            "name": "interviewer_id",
+            "required": true,
+            "in": "path",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InterviewerResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interview"
+        ]
+      }
+    },
+    "/interview/applicant_interviewer/{applicant_id}": {
+      "get": {
+        "operationId": "InterviewController_getApplicantInterview",
+        "parameters": [
+          {
+            "name": "applicant_id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "interviewer_id",
+            "required": true,
+            "in": "path",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicantResponse"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interview"
+        ]
+      }
     }
   },
   "info": {
@@ -632,32 +750,43 @@
           "role"
         ]
       },
-      "User": {
-        "type": "object",
-        "properties": {}
-      },
-      "CreateScheduleDto": {
+      "SelfResponseDto": {
         "type": "object",
         "properties": {
-          "availability_date": {
-            "format": "date-time",
+          "id": {
+            "type": "number"
+          },
+          "name": {
             "type": "string"
           },
-          "availability_time": {
-            "type": "number"
+          "email": {
+            "type": "string"
           },
-          "status": {
+          "image_url": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "createAt": {
+            "type": "string"
+          },
+          "updateAt": {
+            "type": "string"
+          },
+          "hasProfile": {
             "type": "boolean"
-          },
-          "interviewer_id": {
-            "type": "number"
           }
         },
         "required": [
-          "availability_date",
-          "availability_time",
-          "status",
-          "interviewer_id"
+          "id",
+          "name",
+          "email",
+          "image_url",
+          "role",
+          "createAt",
+          "updateAt",
+          "hasProfile"
         ]
       },
       "CreateApplicantDto": {
@@ -786,6 +915,45 @@
           "user_id"
         ]
       },
+      "AllInterviewerResponse": {
+        "type": "object",
+        "properties": {
+          "experience": {
+            "type": "number"
+          },
+          "address": {
+            "type": "string"
+          },
+          "current_company": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "rating": {
+            "type": "number"
+          },
+          "user": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "image_url": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "required": [
+          "experience",
+          "address",
+          "current_company",
+          "price",
+          "rating",
+          "user"
+        ]
+      },
       "InterviewerProfileResponse": {
         "type": "object",
         "properties": {
@@ -842,6 +1010,30 @@
           }
         }
       },
+      "CreateScheduleDto": {
+        "type": "object",
+        "properties": {
+          "availability_date": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "availability_time": {
+            "type": "number"
+          },
+          "status": {
+            "type": "boolean"
+          },
+          "interviewer_id": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "availability_date",
+          "availability_time",
+          "status",
+          "interviewer_id"
+        ]
+      },
       "CreateSkillDto": {
         "type": "object",
         "properties": {
@@ -886,7 +1078,7 @@
             "type": "string"
           },
           "skill_experience": {
-            "type": "string"
+            "type": "number"
           }
         },
         "required": [
@@ -908,6 +1100,138 @@
             "type": "number"
           }
         }
+      },
+      "CreateInterviewDto": {
+        "type": "object",
+        "properties": {
+          "interview_date": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "interview_time": {
+            "type": "number"
+          },
+          "interview_status": {
+            "type": "string"
+          },
+          "payment_id": {
+            "type": "string"
+          },
+          "interviewer_id": {
+            "type": "number"
+          },
+          "applicant_id": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "interview_date",
+          "interview_time",
+          "interview_status",
+          "payment_id",
+          "interviewer_id",
+          "applicant_id"
+        ]
+      },
+      "InterviewerResponse": {
+        "type": "object",
+        "properties": {
+          "interview_date": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "interview_time": {
+            "type": "number"
+          },
+          "interview_status": {
+            "type": "string"
+          },
+          "interviewer_id": {
+            "type": "number"
+          },
+          "applicant": {
+            "type": "object",
+            "properties": {
+              "github_url": {
+                "type": "string"
+              },
+              "linkedin_url": {
+                "type": "string"
+              },
+              "current_company": {
+                "type": "string"
+              },
+              "experience": {
+                "type": "number"
+              },
+              "user": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "image_url": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "interview_date",
+          "interview_time",
+          "interview_status",
+          "interviewer_id",
+          "applicant"
+        ]
+      },
+      "ApplicantResponse": {
+        "type": "object",
+        "properties": {
+          "interview_date": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "interview_time": {
+            "type": "number"
+          },
+          "interview_status": {
+            "type": "string"
+          },
+          "applicant_id": {
+            "type": "number"
+          },
+          "interviewer": {
+            "type": "object",
+            "properties": {
+              "current_company": {
+                "type": "string"
+              },
+              "experience": {
+                "type": "number"
+              },
+              "user": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  },
+                  "image_url": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "interview_date",
+          "interview_time",
+          "interview_status",
+          "applicant_id",
+          "interviewer"
+        ]
       }
     }
   }

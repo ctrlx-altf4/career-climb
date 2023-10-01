@@ -13,8 +13,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
-  useApplicantControllerCreate,
-  useSkillControllerFindAll,
+  useInterviewerControllerCreate,
   useUserControllerSelf,
 } from "@/api/generated";
 import { parsePhoneNumber } from "libphonenumber-js";
@@ -33,20 +32,7 @@ import { useState } from "react";
 // } from "@/components/ui/select";
 
 const formSchema = z.object({
-  githubUrl: z
-    .string()
-    .regex(
-      /^(https:\/\/)?(www\.)?github\.com\/[a-zA-Z0-9-]+(\/)?$/,
-      "Invalid Github Url",
-    ),
-  linkedUrl: z
-    .string()
-    .regex(
-      new RegExp(
-        /^(https?:\/\/)?(www\.)?linkedin\.com\/(in|pub|company)\/[\w-]+\/?$/,
-      ),
-      "Invalid Linkedin url",
-    ),
+  price: z.number().default(500),
   address: z.string(),
   phone: z.string().refine((value) => {
     if (!value) return false;
@@ -64,12 +50,12 @@ function ApplicantProfileForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      githubUrl: "",
+      price: 500,
     },
   });
 
   const { data: me } = useUserControllerSelf();
-  const { mutateAsync, isLoading } = useApplicantControllerCreate();
+  const { mutateAsync, isLoading } = useInterviewerControllerCreate();
 
   const [showSkillsForm, setShowSkillsForm] = useState(false);
   const { toast } = useToast();
@@ -85,20 +71,19 @@ function ApplicantProfileForm() {
       data: {
         experience: 0,
         interview_count: 0,
+        dob: "2023-10-01T03:45:18.318Z",
         address: values.address,
-        github_url: values.githubUrl,
-        linkedin_url: values.linkedUrl,
         phone: values.phone,
         current_company: values.current_company,
-        dob: "2023-10-01T03:45:18.318Z",
+        price: values.price,
         user_id: me.id,
         rating: 0,
       },
     })
-      .then((res) => {
+      .then(() => {
         setShowSkillsForm(true);
       })
-      .catch((err) => {
+      .catch(() => {
         toast({
           title: "Failed to submit",
           description: "Please Try again, Something went wrong",
@@ -111,12 +96,12 @@ function ApplicantProfileForm() {
     <div>
       <h1 className="text-lg font-medium ">Please Complete Your Profile</h1>
       <span className="text-xs text-slate-700">
-        Completing your profile helps us evaluate your need. You can then
-        explore the experts based on your experience
+        Completing your profile helps us evaluate your need. You can then be
+        found by the candidates who want to schedule interview with you.
       </span>
       <div className="mt-4">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-2">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
             <FormField
               control={form.control}
               name="address"
@@ -168,33 +153,16 @@ function ApplicantProfileForm() {
 
             <FormField
               control={form.control}
-              name="githubUrl"
+              name="price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Github Url</FormLabel>
+                  <FormLabel>Price</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://github.com" {...field} />
+                    <Input placeholder="500" {...field} />
                   </FormControl>
-                  {/*<FormDescription>*/}
-                  {/*  This is your public display name.*/}
-                  {/*</FormDescription>*/}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="linkedUrl"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Linked In Url</FormLabel>
-                  <FormControl>
-                    <Input placeholder="https://linkedin.com" {...field} />
-                  </FormControl>
-                  {/*<FormDescription>*/}
-                  {/*  This is your public display name.*/}
-                  {/*</FormDescription>*/}
+                  <FormDescription>
+                    Set price for an hour of interview with you
+                  </FormDescription>
                   <FormMessage />
                 </FormItem>
               )}

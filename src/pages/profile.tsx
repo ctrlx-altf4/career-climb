@@ -20,19 +20,18 @@ import { useForm } from "react-hook-form";
 import {
   Form,
   FormControl,
-  FormDescription,
-  FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import {
-  useApplicantControllerGetPersonal,
   useApplicantControllerGetProfile,
   useSkillControllerFindAll,
+  useSkillControllerFindOne,
   useUserControllerSelf,
 } from "@/api/generated";
+import { experienceArray } from "@/lib/constant";
 const formSchema = z.object({
   githubUrl: z.string(),
   linkedUrl: z.string(),
@@ -45,87 +44,68 @@ function ProfessionalDetailsForm() {
     },
   });
 
-  // 2. Define a submit handler.
+  const { data: me } = useUserControllerSelf();
+
+  const { data: profile } = useApplicantControllerGetProfile(String(me?.id!));
+
+  const { data: skills } = useSkillControllerFindOne(String(me?.id));
+
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+    alert("NOT implemented");
   }
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="githubUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Github Url</FormLabel>
-              <FormControl>
-                <Input placeholder="https://github.com" {...field} />
-              </FormControl>
-              {/*<FormDescription>*/}
-              {/*  This is your public display name.*/}
-              {/*</FormDescription>*/}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="linkedUrl"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Linked In Url</FormLabel>
-              <FormControl>
-                <Input placeholder="https://linkedin.com" {...field} />
-              </FormControl>
-              {/*<FormDescription>*/}
-              {/*  This is your public display name.*/}
-              {/*</FormDescription>*/}
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <FormItem>
+          <FormLabel>Github Url</FormLabel>
+          <FormControl>
+            <Input
+              placeholder="https://github.com"
+              value={profile?.github_url}
+              disabled
+            />
+          </FormControl>
+          {/*<FormDescription>*/}
+          {/*  This is your public display name.*/}
+          {/*</FormDescription>*/}
+          <FormMessage />
+        </FormItem>
+        <FormItem>
+          <FormLabel>Linked In Url</FormLabel>
+          <FormControl>
+            <Input
+              placeholder="https://linked.com"
+              value={profile?.linkedin_url}
+              disabled
+            />
+          </FormControl>
+
+          <FormMessage />
+        </FormItem>
 
         <div className="flex flex-col">
           <p>Skills</p>
           <div className="flex gap-4 mt-4">
-            {skills.map((skill) => {
+            {skills?.map((skill) => {
               return (
                 <div
                   className="rounded border px-4 py-1 bg-slate-50"
-                  key={skill.title}
+                  key={skill.skill_id}
                 >
-                  <div>{skill.title}</div>
-                  <div>{skill.yoe}</div>
+                  <div>{skill?.skill?.skill_name}</div>
+                  <div>{experienceArray[skill.skill_experience].label}</div>
                 </div>
               );
             })}
           </div>
         </div>
-        <Button type="submit">Submit</Button>
+        {/*<Button type="submit">Update</Button>*/}
       </form>
     </Form>
   );
 }
-const skills = [
-  {
-    title: "React",
-    yoe: "2+ years",
-  },
-  {
-    title: "Golang",
-    yoe: "3+ years",
-  },
-  {
-    title: "Postgres",
-    yoe: "3 years",
-  },
-  {
-    title: "Hadoop",
-    yoe: "Less than 1 years",
-  },
-];
+
 const data = [
   {
     id: "Sess-8782",

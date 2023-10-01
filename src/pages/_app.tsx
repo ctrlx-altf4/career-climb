@@ -3,6 +3,7 @@ import type { AppProps } from "next/app";
 import type { ReactElement, ReactNode } from "react";
 import type { NextPage } from "next";
 import { Poppins, Inter } from "next/font/google";
+import { Toaster } from "@/components/ui/toaster";
 
 import {
   Hydrate,
@@ -50,6 +51,7 @@ export default function MyApp({ Component, pageProps }: AppPropsWithLayout) {
       <QueryClientProvider client={queryClient}>
         <Hydrate state={pageProps.dehydratedState}>
           {getLayout(<Component {...pageProps} />)}
+          <Toaster />
         </Hydrate>
       </QueryClientProvider>
     </main>

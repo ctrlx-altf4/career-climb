@@ -16,6 +16,55 @@ import type {
 } from "@tanstack/react-query";
 import { useAxios } from "./useAxios";
 import type { ErrorType, BodyType } from "./useAxios";
+export type ApplicantResponseInterviewerUser = {
+  name?: string;
+  image_url?: string;
+};
+
+export type ApplicantResponseInterviewer = {
+  current_company?: string;
+  experience?: number;
+  user?: ApplicantResponseInterviewerUser;
+};
+
+export interface ApplicantResponse {
+  interview_date: string;
+  interview_time: number;
+  interview_status: string;
+  applicant_id: number;
+  interviewer: ApplicantResponseInterviewer;
+}
+
+export type InterviewerResponseApplicantUser = {
+  name?: string;
+  image_url?: string;
+};
+
+export type InterviewerResponseApplicant = {
+  github_url?: string;
+  linkedin_url?: string;
+  current_company?: string;
+  experience?: number;
+  user?: InterviewerResponseApplicantUser;
+};
+
+export interface InterviewerResponse {
+  interview_date: string;
+  interview_time: number;
+  interview_status: string;
+  interviewer_id: number;
+  applicant: InterviewerResponseApplicant;
+}
+
+export interface CreateInterviewDto {
+  interview_date: string;
+  interview_time: number;
+  interview_status: string;
+  payment_id: string;
+  interviewer_id: number;
+  applicant_id: number;
+}
+
 export interface UpdateSkillDto {
   skill_name?: string;
   user_id?: number;
@@ -25,7 +74,7 @@ export interface UpdateSkillDto {
 export interface UserSkillResponse {
   skill_id: number;
   skill_name: string;
-  skill_experience: string;
+  skill_experience: number;
 }
 
 export interface AllSkillResponse {
@@ -37,6 +86,13 @@ export interface CreateSkillDto {
   skill_name: string;
   user_id: number;
   skill_experience: number;
+}
+
+export interface CreateScheduleDto {
+  availability_date: string;
+  availability_time: number;
+  status: boolean;
+  interviewer_id: number;
 }
 
 export interface UpdateInterviewerDto {
@@ -56,6 +112,20 @@ export interface InterviewerProfileResponse {
   address: string;
   phone: string;
   price: number;
+}
+
+export type AllInterviewerResponseUser = {
+  name?: string;
+  image_url?: string;
+};
+
+export interface AllInterviewerResponse {
+  experience: number;
+  address: string;
+  current_company: string;
+  price: number;
+  rating: number;
+  user: AllInterviewerResponseUser;
 }
 
 export interface CreateInterviewerDto {
@@ -94,15 +164,15 @@ export interface CreateApplicantDto {
   user_id: number;
 }
 
-export interface CreateScheduleDto {
-  availability_date: string;
-  availability_time: number;
-  status: boolean;
-  interviewer_id: number;
-}
-
-export interface User {
-  [key: string]: any;
+export interface SelfResponseDto {
+  id: number;
+  name: string;
+  email: string;
+  image_url: string;
+  role: string;
+  createAt: string;
+  updateAt: string;
+  hasProfile: boolean;
 }
 
 export interface UpdateUserRoleDto {
@@ -242,7 +312,7 @@ export const useUserControllerChangeUserRole = <
 };
 
 export const useUserControllerSelfHook = () => {
-  const userControllerSelf = useAxios<User>();
+  const userControllerSelf = useAxios<SelfResponseDto>();
 
   return (signal?: AbortSignal) => {
     return userControllerSelf({ url: `/user/me`, method: "get", signal });
@@ -454,304 +524,6 @@ export const useAuthControllerGoogleAuthRedirect = <
   query.queryKey = queryOptions.queryKey;
 
   return query;
-};
-
-export const useScheduleControllerCreateHook = () => {
-  const scheduleControllerCreate = useAxios<void>();
-
-  return (createScheduleDto: BodyType<CreateScheduleDto>) => {
-    return scheduleControllerCreate({
-      url: `/interviewer-availability`,
-      method: "post",
-      headers: { "Content-Type": "application/json" },
-      data: createScheduleDto,
-    });
-  };
-};
-
-export const useScheduleControllerCreateMutationOptions = <
-  TError = ErrorType<unknown>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>,
-    TError,
-    { data: BodyType<CreateScheduleDto> },
-    TContext
-  >;
-}): UseMutationOptions<
-  Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>,
-  TError,
-  { data: BodyType<CreateScheduleDto> },
-  TContext
-> => {
-  const { mutation: mutationOptions } = options ?? {};
-
-  const scheduleControllerCreate = useScheduleControllerCreateHook();
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>,
-    { data: BodyType<CreateScheduleDto> }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return scheduleControllerCreate(data);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type ScheduleControllerCreateMutationResult = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>
->;
-export type ScheduleControllerCreateMutationBody = BodyType<CreateScheduleDto>;
-export type ScheduleControllerCreateMutationError = ErrorType<unknown>;
-
-export const useScheduleControllerCreate = <
-  TError = ErrorType<unknown>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>,
-    TError,
-    { data: BodyType<CreateScheduleDto> },
-    TContext
-  >;
-}) => {
-  const mutationOptions = useScheduleControllerCreateMutationOptions(options);
-
-  return useMutation(mutationOptions);
-};
-
-export const useScheduleControllerFindAllHook = () => {
-  const scheduleControllerFindAll = useAxios<CreateScheduleDto[]>();
-
-  return (interviewerId: unknown, signal?: AbortSignal) => {
-    return scheduleControllerFindAll({
-      url: `/interviewer-availability/get-all-schedule/${interviewerId}`,
-      method: "get",
-      signal,
-    });
-  };
-};
-
-export const getScheduleControllerFindAllQueryKey = (interviewerId: unknown) =>
-  [`/interviewer-availability/get-all-schedule/${interviewerId}`] as const;
-
-export const useScheduleControllerFindAllQueryOptions = <
-  TData = Awaited<
-    ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>
-  >,
-  TError = ErrorType<unknown>,
->(
-  interviewerId: unknown,
-  options?: {
-    query?: UseQueryOptions<
-      Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>>,
-      TError,
-      TData
-    >;
-  },
-): UseQueryOptions<
-  Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>>,
-  TError,
-  TData
-> & { queryKey: QueryKey } => {
-  const { query: queryOptions } = options ?? {};
-
-  const queryKey =
-    queryOptions?.queryKey ??
-    getScheduleControllerFindAllQueryKey(interviewerId);
-
-  const scheduleControllerFindAll = useScheduleControllerFindAllHook();
-
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>>
-  > = ({ signal }) => scheduleControllerFindAll(interviewerId, signal);
-
-  return { queryKey, queryFn, enabled: !!interviewerId, ...queryOptions };
-};
-
-export type ScheduleControllerFindAllQueryResult = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>>
->;
-export type ScheduleControllerFindAllQueryError = ErrorType<unknown>;
-
-export const useScheduleControllerFindAll = <
-  TData = Awaited<
-    ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>
-  >,
-  TError = ErrorType<unknown>,
->(
-  interviewerId: unknown,
-  options?: {
-    query?: UseQueryOptions<
-      Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>>,
-      TError,
-      TData
-    >;
-  },
-): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
-  const queryOptions = useScheduleControllerFindAllQueryOptions(
-    interviewerId,
-    options,
-  );
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
-    queryKey: QueryKey;
-  };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-};
-
-export const useScheduleControllerFindOneHook = () => {
-  const scheduleControllerFindOne = useAxios<CreateScheduleDto>();
-
-  return (availabilityId: string, signal?: AbortSignal) => {
-    return scheduleControllerFindOne({
-      url: `/interviewer-availability/${availabilityId}`,
-      method: "get",
-      signal,
-    });
-  };
-};
-
-export const getScheduleControllerFindOneQueryKey = (availabilityId: string) =>
-  [`/interviewer-availability/${availabilityId}`] as const;
-
-export const useScheduleControllerFindOneQueryOptions = <
-  TData = Awaited<
-    ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>
-  >,
-  TError = ErrorType<unknown>,
->(
-  availabilityId: string,
-  options?: {
-    query?: UseQueryOptions<
-      Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>>,
-      TError,
-      TData
-    >;
-  },
-): UseQueryOptions<
-  Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>>,
-  TError,
-  TData
-> & { queryKey: QueryKey } => {
-  const { query: queryOptions } = options ?? {};
-
-  const queryKey =
-    queryOptions?.queryKey ??
-    getScheduleControllerFindOneQueryKey(availabilityId);
-
-  const scheduleControllerFindOne = useScheduleControllerFindOneHook();
-
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>>
-  > = ({ signal }) => scheduleControllerFindOne(availabilityId, signal);
-
-  return { queryKey, queryFn, enabled: !!availabilityId, ...queryOptions };
-};
-
-export type ScheduleControllerFindOneQueryResult = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>>
->;
-export type ScheduleControllerFindOneQueryError = ErrorType<unknown>;
-
-export const useScheduleControllerFindOne = <
-  TData = Awaited<
-    ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>
-  >,
-  TError = ErrorType<unknown>,
->(
-  availabilityId: string,
-  options?: {
-    query?: UseQueryOptions<
-      Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>>,
-      TError,
-      TData
-    >;
-  },
-): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
-  const queryOptions = useScheduleControllerFindOneQueryOptions(
-    availabilityId,
-    options,
-  );
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
-    queryKey: QueryKey;
-  };
-
-  query.queryKey = queryOptions.queryKey;
-
-  return query;
-};
-
-export const useScheduleControllerRemoveHook = () => {
-  const scheduleControllerRemove = useAxios<void>();
-
-  return (availabilityId: string) => {
-    return scheduleControllerRemove({
-      url: `/interviewer-availability/${availabilityId}`,
-      method: "delete",
-    });
-  };
-};
-
-export const useScheduleControllerRemoveMutationOptions = <
-  TError = ErrorType<unknown>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<ReturnType<typeof useScheduleControllerRemoveHook>>>,
-    TError,
-    { availabilityId: string },
-    TContext
-  >;
-}): UseMutationOptions<
-  Awaited<ReturnType<ReturnType<typeof useScheduleControllerRemoveHook>>>,
-  TError,
-  { availabilityId: string },
-  TContext
-> => {
-  const { mutation: mutationOptions } = options ?? {};
-
-  const scheduleControllerRemove = useScheduleControllerRemoveHook();
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<ReturnType<typeof useScheduleControllerRemoveHook>>>,
-    { availabilityId: string }
-  > = (props) => {
-    const { availabilityId } = props ?? {};
-
-    return scheduleControllerRemove(availabilityId);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type ScheduleControllerRemoveMutationResult = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof useScheduleControllerRemoveHook>>>
->;
-
-export type ScheduleControllerRemoveMutationError = ErrorType<unknown>;
-
-export const useScheduleControllerRemove = <
-  TError = ErrorType<unknown>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<ReturnType<typeof useScheduleControllerRemoveHook>>>,
-    TError,
-    { availabilityId: string },
-    TContext
-  >;
-}) => {
-  const mutationOptions = useScheduleControllerRemoveMutationOptions(options);
-
-  return useMutation(mutationOptions);
 };
 
 export const useApplicantControllerCreateHook = () => {
@@ -1220,6 +992,108 @@ export const useInterviewerControllerCreate = <
   return useMutation(mutationOptions);
 };
 
+export const useInterviewerControllerGetAllInterviewersHook = () => {
+  const interviewerControllerGetAllInterviewers =
+    useAxios<AllInterviewerResponse[]>();
+
+  return (signal?: AbortSignal) => {
+    return interviewerControllerGetAllInterviewers({
+      url: `/interviewer-profile/get-all-interviewers`,
+      method: "get",
+      signal,
+    });
+  };
+};
+
+export const getInterviewerControllerGetAllInterviewersQueryKey = () =>
+  [`/interviewer-profile/get-all-interviewers`] as const;
+
+export const useInterviewerControllerGetAllInterviewersQueryOptions = <
+  TData = Awaited<
+    ReturnType<
+      ReturnType<typeof useInterviewerControllerGetAllInterviewersHook>
+    >
+  >,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<
+      ReturnType<
+        ReturnType<typeof useInterviewerControllerGetAllInterviewersHook>
+      >
+    >,
+    TError,
+    TData
+  >;
+}): UseQueryOptions<
+  Awaited<
+    ReturnType<
+      ReturnType<typeof useInterviewerControllerGetAllInterviewersHook>
+    >
+  >,
+  TError,
+  TData
+> & { queryKey: QueryKey } => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getInterviewerControllerGetAllInterviewersQueryKey();
+
+  const interviewerControllerGetAllInterviewers =
+    useInterviewerControllerGetAllInterviewersHook();
+
+  const queryFn: QueryFunction<
+    Awaited<
+      ReturnType<
+        ReturnType<typeof useInterviewerControllerGetAllInterviewersHook>
+      >
+    >
+  > = ({ signal }) => interviewerControllerGetAllInterviewers(signal);
+
+  return { queryKey, queryFn, ...queryOptions };
+};
+
+export type InterviewerControllerGetAllInterviewersQueryResult = NonNullable<
+  Awaited<
+    ReturnType<
+      ReturnType<typeof useInterviewerControllerGetAllInterviewersHook>
+    >
+  >
+>;
+export type InterviewerControllerGetAllInterviewersQueryError =
+  ErrorType<unknown>;
+
+export const useInterviewerControllerGetAllInterviewers = <
+  TData = Awaited<
+    ReturnType<
+      ReturnType<typeof useInterviewerControllerGetAllInterviewersHook>
+    >
+  >,
+  TError = ErrorType<unknown>,
+>(options?: {
+  query?: UseQueryOptions<
+    Awaited<
+      ReturnType<
+        ReturnType<typeof useInterviewerControllerGetAllInterviewersHook>
+      >
+    >,
+    TError,
+    TData
+  >;
+}): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions =
+    useInterviewerControllerGetAllInterviewersQueryOptions(options);
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+};
+
 export const useInterviewerControllerGetProfileHook = () => {
   const interviewerControllerGetProfile = useAxios<CreateInterviewerDto>();
 
@@ -1475,6 +1349,304 @@ export const useInterviewerControllerUpdate = <
 }) => {
   const mutationOptions =
     useInterviewerControllerUpdateMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const useScheduleControllerCreateHook = () => {
+  const scheduleControllerCreate = useAxios<void>();
+
+  return (createScheduleDto: BodyType<CreateScheduleDto>) => {
+    return scheduleControllerCreate({
+      url: `/interviewer-availability`,
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      data: createScheduleDto,
+    });
+  };
+};
+
+export const useScheduleControllerCreateMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>,
+    TError,
+    { data: BodyType<CreateScheduleDto> },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>,
+  TError,
+  { data: BodyType<CreateScheduleDto> },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const scheduleControllerCreate = useScheduleControllerCreateHook();
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>,
+    { data: BodyType<CreateScheduleDto> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return scheduleControllerCreate(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ScheduleControllerCreateMutationResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>
+>;
+export type ScheduleControllerCreateMutationBody = BodyType<CreateScheduleDto>;
+export type ScheduleControllerCreateMutationError = ErrorType<unknown>;
+
+export const useScheduleControllerCreate = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>,
+    TError,
+    { data: BodyType<CreateScheduleDto> },
+    TContext
+  >;
+}) => {
+  const mutationOptions = useScheduleControllerCreateMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const useScheduleControllerFindAllHook = () => {
+  const scheduleControllerFindAll = useAxios<CreateScheduleDto[]>();
+
+  return (interviewerId: unknown, signal?: AbortSignal) => {
+    return scheduleControllerFindAll({
+      url: `/interviewer-availability/get-all-schedule/${interviewerId}`,
+      method: "get",
+      signal,
+    });
+  };
+};
+
+export const getScheduleControllerFindAllQueryKey = (interviewerId: unknown) =>
+  [`/interviewer-availability/get-all-schedule/${interviewerId}`] as const;
+
+export const useScheduleControllerFindAllQueryOptions = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  interviewerId: unknown,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>>,
+      TError,
+      TData
+    >;
+  },
+): UseQueryOptions<
+  Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>>,
+  TError,
+  TData
+> & { queryKey: QueryKey } => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getScheduleControllerFindAllQueryKey(interviewerId);
+
+  const scheduleControllerFindAll = useScheduleControllerFindAllHook();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>>
+  > = ({ signal }) => scheduleControllerFindAll(interviewerId, signal);
+
+  return { queryKey, queryFn, enabled: !!interviewerId, ...queryOptions };
+};
+
+export type ScheduleControllerFindAllQueryResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>>
+>;
+export type ScheduleControllerFindAllQueryError = ErrorType<unknown>;
+
+export const useScheduleControllerFindAll = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  interviewerId: unknown,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>>,
+      TError,
+      TData
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = useScheduleControllerFindAllQueryOptions(
+    interviewerId,
+    options,
+  );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+};
+
+export const useScheduleControllerFindOneHook = () => {
+  const scheduleControllerFindOne = useAxios<CreateScheduleDto>();
+
+  return (availabilityId: string, signal?: AbortSignal) => {
+    return scheduleControllerFindOne({
+      url: `/interviewer-availability/${availabilityId}`,
+      method: "get",
+      signal,
+    });
+  };
+};
+
+export const getScheduleControllerFindOneQueryKey = (availabilityId: string) =>
+  [`/interviewer-availability/${availabilityId}`] as const;
+
+export const useScheduleControllerFindOneQueryOptions = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  availabilityId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>>,
+      TError,
+      TData
+    >;
+  },
+): UseQueryOptions<
+  Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>>,
+  TError,
+  TData
+> & { queryKey: QueryKey } => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getScheduleControllerFindOneQueryKey(availabilityId);
+
+  const scheduleControllerFindOne = useScheduleControllerFindOneHook();
+
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>>
+  > = ({ signal }) => scheduleControllerFindOne(availabilityId, signal);
+
+  return { queryKey, queryFn, enabled: !!availabilityId, ...queryOptions };
+};
+
+export type ScheduleControllerFindOneQueryResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>>
+>;
+export type ScheduleControllerFindOneQueryError = ErrorType<unknown>;
+
+export const useScheduleControllerFindOne = <
+  TData = Awaited<
+    ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>
+  >,
+  TError = ErrorType<unknown>,
+>(
+  availabilityId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindOneHook>>>,
+      TError,
+      TData
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = useScheduleControllerFindOneQueryOptions(
+    availabilityId,
+    options,
+  );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+};
+
+export const useScheduleControllerRemoveHook = () => {
+  const scheduleControllerRemove = useAxios<void>();
+
+  return (availabilityId: string) => {
+    return scheduleControllerRemove({
+      url: `/interviewer-availability/${availabilityId}`,
+      method: "delete",
+    });
+  };
+};
+
+export const useScheduleControllerRemoveMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useScheduleControllerRemoveHook>>>,
+    TError,
+    { availabilityId: string },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<ReturnType<typeof useScheduleControllerRemoveHook>>>,
+  TError,
+  { availabilityId: string },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const scheduleControllerRemove = useScheduleControllerRemoveHook();
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<ReturnType<typeof useScheduleControllerRemoveHook>>>,
+    { availabilityId: string }
+  > = (props) => {
+    const { availabilityId } = props ?? {};
+
+    return scheduleControllerRemove(availabilityId);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type ScheduleControllerRemoveMutationResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useScheduleControllerRemoveHook>>>
+>;
+
+export type ScheduleControllerRemoveMutationError = ErrorType<unknown>;
+
+export const useScheduleControllerRemove = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useScheduleControllerRemoveHook>>>,
+    TError,
+    { availabilityId: string },
+    TContext
+  >;
+}) => {
+  const mutationOptions = useScheduleControllerRemoveMutationOptions(options);
 
   return useMutation(mutationOptions);
 };
@@ -1815,4 +1987,297 @@ export const useSkillControllerRemove = <
   const mutationOptions = useSkillControllerRemoveMutationOptions(options);
 
   return useMutation(mutationOptions);
+};
+
+export const useInterviewControllerCreateHook = () => {
+  const interviewControllerCreate = useAxios<void>();
+
+  return (createInterviewDto: BodyType<CreateInterviewDto>) => {
+    return interviewControllerCreate({
+      url: `/interview`,
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      data: createInterviewDto,
+    });
+  };
+};
+
+export const useInterviewControllerCreateMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useInterviewControllerCreateHook>>>,
+    TError,
+    { data: BodyType<CreateInterviewDto> },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<ReturnType<typeof useInterviewControllerCreateHook>>>,
+  TError,
+  { data: BodyType<CreateInterviewDto> },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const interviewControllerCreate = useInterviewControllerCreateHook();
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<ReturnType<typeof useInterviewControllerCreateHook>>>,
+    { data: BodyType<CreateInterviewDto> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return interviewControllerCreate(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type InterviewControllerCreateMutationResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useInterviewControllerCreateHook>>>
+>;
+export type InterviewControllerCreateMutationBody =
+  BodyType<CreateInterviewDto>;
+export type InterviewControllerCreateMutationError = ErrorType<unknown>;
+
+export const useInterviewControllerCreate = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<ReturnType<typeof useInterviewControllerCreateHook>>>,
+    TError,
+    { data: BodyType<CreateInterviewDto> },
+    TContext
+  >;
+}) => {
+  const mutationOptions = useInterviewControllerCreateMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const useInterviewControllerGetInterviewerInterviewHook = () => {
+  const interviewControllerGetInterviewerInterview =
+    useAxios<InterviewerResponse[]>();
+
+  return (interviewerId: unknown, signal?: AbortSignal) => {
+    return interviewControllerGetInterviewerInterview({
+      url: `/interview/interviewer-interviews/${interviewerId}`,
+      method: "get",
+      signal,
+    });
+  };
+};
+
+export const getInterviewControllerGetInterviewerInterviewQueryKey = (
+  interviewerId: unknown,
+) => [`/interview/interviewer-interviews/${interviewerId}`] as const;
+
+export const useInterviewControllerGetInterviewerInterviewQueryOptions = <
+  TData = Awaited<
+    ReturnType<
+      ReturnType<typeof useInterviewControllerGetInterviewerInterviewHook>
+    >
+  >,
+  TError = ErrorType<unknown>,
+>(
+  interviewerId: unknown,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<
+        ReturnType<
+          ReturnType<typeof useInterviewControllerGetInterviewerInterviewHook>
+        >
+      >,
+      TError,
+      TData
+    >;
+  },
+): UseQueryOptions<
+  Awaited<
+    ReturnType<
+      ReturnType<typeof useInterviewControllerGetInterviewerInterviewHook>
+    >
+  >,
+  TError,
+  TData
+> & { queryKey: QueryKey } => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getInterviewControllerGetInterviewerInterviewQueryKey(interviewerId);
+
+  const interviewControllerGetInterviewerInterview =
+    useInterviewControllerGetInterviewerInterviewHook();
+
+  const queryFn: QueryFunction<
+    Awaited<
+      ReturnType<
+        ReturnType<typeof useInterviewControllerGetInterviewerInterviewHook>
+      >
+    >
+  > = ({ signal }) =>
+    interviewControllerGetInterviewerInterview(interviewerId, signal);
+
+  return { queryKey, queryFn, enabled: !!interviewerId, ...queryOptions };
+};
+
+export type InterviewControllerGetInterviewerInterviewQueryResult = NonNullable<
+  Awaited<
+    ReturnType<
+      ReturnType<typeof useInterviewControllerGetInterviewerInterviewHook>
+    >
+  >
+>;
+export type InterviewControllerGetInterviewerInterviewQueryError =
+  ErrorType<unknown>;
+
+export const useInterviewControllerGetInterviewerInterview = <
+  TData = Awaited<
+    ReturnType<
+      ReturnType<typeof useInterviewControllerGetInterviewerInterviewHook>
+    >
+  >,
+  TError = ErrorType<unknown>,
+>(
+  interviewerId: unknown,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<
+        ReturnType<
+          ReturnType<typeof useInterviewControllerGetInterviewerInterviewHook>
+        >
+      >,
+      TError,
+      TData
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions =
+    useInterviewControllerGetInterviewerInterviewQueryOptions(
+      interviewerId,
+      options,
+    );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
+};
+
+export const useInterviewControllerGetApplicantInterviewHook = () => {
+  const interviewControllerGetApplicantInterview =
+    useAxios<ApplicantResponse[]>();
+
+  return (applicantId: string, signal?: AbortSignal) => {
+    return interviewControllerGetApplicantInterview({
+      url: `/interview/applicant_interviewer/${applicantId}`,
+      method: "get",
+      signal,
+    });
+  };
+};
+
+export const getInterviewControllerGetApplicantInterviewQueryKey = (
+  applicantId: string,
+) => [`/interview/applicant_interviewer/${applicantId}`] as const;
+
+export const useInterviewControllerGetApplicantInterviewQueryOptions = <
+  TData = Awaited<
+    ReturnType<
+      ReturnType<typeof useInterviewControllerGetApplicantInterviewHook>
+    >
+  >,
+  TError = ErrorType<unknown>,
+>(
+  applicantId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<
+        ReturnType<
+          ReturnType<typeof useInterviewControllerGetApplicantInterviewHook>
+        >
+      >,
+      TError,
+      TData
+    >;
+  },
+): UseQueryOptions<
+  Awaited<
+    ReturnType<
+      ReturnType<typeof useInterviewControllerGetApplicantInterviewHook>
+    >
+  >,
+  TError,
+  TData
+> & { queryKey: QueryKey } => {
+  const { query: queryOptions } = options ?? {};
+
+  const queryKey =
+    queryOptions?.queryKey ??
+    getInterviewControllerGetApplicantInterviewQueryKey(applicantId);
+
+  const interviewControllerGetApplicantInterview =
+    useInterviewControllerGetApplicantInterviewHook();
+
+  const queryFn: QueryFunction<
+    Awaited<
+      ReturnType<
+        ReturnType<typeof useInterviewControllerGetApplicantInterviewHook>
+      >
+    >
+  > = ({ signal }) =>
+    interviewControllerGetApplicantInterview(applicantId, signal);
+
+  return { queryKey, queryFn, enabled: !!applicantId, ...queryOptions };
+};
+
+export type InterviewControllerGetApplicantInterviewQueryResult = NonNullable<
+  Awaited<
+    ReturnType<
+      ReturnType<typeof useInterviewControllerGetApplicantInterviewHook>
+    >
+  >
+>;
+export type InterviewControllerGetApplicantInterviewQueryError =
+  ErrorType<unknown>;
+
+export const useInterviewControllerGetApplicantInterview = <
+  TData = Awaited<
+    ReturnType<
+      ReturnType<typeof useInterviewControllerGetApplicantInterviewHook>
+    >
+  >,
+  TError = ErrorType<unknown>,
+>(
+  applicantId: string,
+  options?: {
+    query?: UseQueryOptions<
+      Awaited<
+        ReturnType<
+          ReturnType<typeof useInterviewControllerGetApplicantInterviewHook>
+        >
+      >,
+      TError,
+      TData
+    >;
+  },
+): UseQueryResult<TData, TError> & { queryKey: QueryKey } => {
+  const queryOptions = useInterviewControllerGetApplicantInterviewQueryOptions(
+    applicantId,
+    options,
+  );
+
+  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
+    queryKey: QueryKey;
+  };
+
+  query.queryKey = queryOptions.queryKey;
+
+  return query;
 };

@@ -13,7 +13,7 @@ import useAuthStore from "@/lib/store/auth";
 import { useEffect, useState } from "react";
 import { useUserControllerSelf } from "@/api/generated";
 import Image from "next/image";
-import ApplicantProfileForm from "@/components/pages/applicant/applicant-profile-form";
+import InterviewerProfileForm from "@/components/pages/interviewer/interviewer-profile-form";
 import {
   Dialog,
   DialogContent,
@@ -123,7 +123,7 @@ function Sidebar() {
   );
 }
 
-export default function ApplicantLayout({
+export default function InterviewerLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -163,7 +163,7 @@ export default function ApplicantLayout({
     return (
       <div className="bg-gradient-to-t from-transparent pt-28 to-indigo-400 h-screen w-screen flex items-center justify-center">
         <div className=" max-w-lg bg-white shadow px-4   rounded-lg mx-auto py-5">
-          <ApplicantProfileForm />
+          <InterviewerProfileForm />
         </div>
       </div>
     );

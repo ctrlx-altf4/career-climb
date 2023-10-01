@@ -2,30 +2,59 @@ import Image from "next/image";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 import useAuthStore from "@/lib/store/auth";
+import {
+  useUserControllerChangeUserRole,
+  useUserControllerSelf,
+} from "@/api/generated";
+import { headers } from "next/headers";
 
 function Success() {
   const router = useRouter();
 
-  const addToken = useAuthStore((state) => state.addToken);
+  const { addToken, accessToken } = useAuthStore();
+
+  const { data: me, isLoading } = useUserControllerSelf({
+    query: {
+      enabled: !!accessToken,
+    },
+  });
+
+  const { mutateAsync: changeUserRole } = useUserControllerChangeUserRole();
 
   useEffect(() => {
-    // Get the query parameters from the URL
     const queryParameters = new URLSearchParams(window.location.search);
-
-    // Get the value of the "access_token" parameter
     const accessToken = queryParameters.get("access_token");
 
     if (accessToken) {
-      // You can do whatever you need with the access token here
       addToken(accessToken);
-      const isCandidate = localStorage.getItem("isCandidate");
-      console.log("IsCandidate", Boolean(isCandidate));
-      void router.replace("/applicant/dashboard");
-    } else {
-      //TODO: do something here
     }
-  }, []);
+  }, [addToken]);
 
+  // TODO: redo this logic from backend
+  useEffect(() => {
+    if (me?.id) {
+      if (me.hasProfile) {
+        if (me?.role === "user") {
+          void router.replace("/applicant/dashboard");
+        } else {
+          void router.replace("/interviewer/dashboard");
+        }
+      } else {
+        const isCandidate = localStorage.getItem("isCandidate");
+        if (isCandidate === "true") {
+          void router.replace("/applicant/dashboard");
+        } else {
+          changeUserRole({
+            data: {
+              role: "interviewer",
+            },
+          }).then((res) => {
+            void router.replace("/interviewer/dashboard");
+          });
+        }
+      }
+    }
+  }, [me?.id, me?.hasProfile, me?.role, router]);
   return (
     <div className="h-screen w-screen flex flex-col  items-center justify-center">
       <div className="spinner-container">
