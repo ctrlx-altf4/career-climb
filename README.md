@@ -1,40 +1,33 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## Business Perspective
 
-## Getting Started
+Lets think this from business perspective..
 
-First, run the development server:
+There are lots of candidates who want to practice real-world interviews to climb their career ladder. So we , as a platform, provide them  with interviewers. So that would mean our customers will be the candidates.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+So what will be the flow?
+- We, as a business, onboard skilled interviewers ask them to add their skills, their time availability, and their payment.
+- Candidates will register themselves, build up their profile add their CVs and register for the interview, they also set their time availability and the title for which they want to interview.
+- Now, we as a system , shall provide list of  relevant /available interviewers and the amount they are asking for.
+- Candidates can choose interviewers.
+- Interviewers will get notification or email (for now lets focus on email). and they accept or reject the interview
+- Once accepted, Candidates will now pay and the interview is scheduled.
+- We , as a business, will take certain percent of the payment ( we won't implement this for now). Also, interviewers can ask for payout ( we won't implement this for now)
+- Once the interview is completed. Both Candidates and interviewer can give feedback. Feedback can be personal and public.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
+## Database Initial Design
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+- https://dbdocs.io/aashish/CareerClimb  pasword: 3JCCqbqH@ud7uG3
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
+## Constraints Set
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+ - No recurring schedules
+ - One hour availabiliy difference and One hour Meeting by default
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Setbacks
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+ - Initially used typedORM, then changed to sequelize-typescript
+ - Initially started with Stripe payment, later settled with Khalti
