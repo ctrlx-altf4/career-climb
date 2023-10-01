@@ -128,7 +128,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateApplicantDto"
+                  "$ref": "#/components/schemas/GetApplicantDto"
                 }
               }
             }
@@ -299,7 +299,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CreateInterviewerDto"
+                  "$ref": "#/components/schemas/GetInterviewerDto"
                 }
               }
             }
@@ -375,14 +375,14 @@
     },
     "/interviewer-availability": {
       "post": {
-        "operationId": "ScheduleController_create",
+        "operationId": "ScheduleController_bulkCreate",
         "parameters": [],
         "requestBody": {
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CreateScheduleDto"
+                "$ref": "#/components/schemas/BulkCreateScheduleDto"
               }
             }
           }
@@ -405,7 +405,9 @@
             "name": "interviewer_id",
             "required": true,
             "in": "path",
-            "schema": {}
+            "schema": {
+              "type": "number"
+            }
           }
         ],
         "responses": {
@@ -416,7 +418,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/CreateScheduleDto"
+                    "$ref": "#/components/schemas/GetInterviewScheduleDto"
                   }
                 }
               }
@@ -837,6 +839,58 @@
           "user_id"
         ]
       },
+      "GetApplicantDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "experience": {
+            "type": "number"
+          },
+          "interview_count": {
+            "type": "number"
+          },
+          "dob": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "current_company": {
+            "type": "string"
+          },
+          "linkedin_url": {
+            "type": "string"
+          },
+          "github_url": {
+            "type": "string"
+          },
+          "rating": {
+            "type": "number"
+          },
+          "user_id": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "experience",
+          "interview_count",
+          "dob",
+          "address",
+          "phone",
+          "current_company",
+          "linkedin_url",
+          "github_url",
+          "rating",
+          "user_id"
+        ]
+      },
       "SocialProfileResponse": {
         "type": "object",
         "properties": {
@@ -921,6 +975,9 @@
           "experience": {
             "type": "number"
           },
+          "user_id": {
+            "type": "number"
+          },
           "address": {
             "type": "string"
           },
@@ -947,11 +1004,60 @@
         },
         "required": [
           "experience",
+          "user_id",
           "address",
           "current_company",
           "price",
           "rating",
           "user"
+        ]
+      },
+      "GetInterviewerDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "experience": {
+            "type": "number"
+          },
+          "interview_count": {
+            "type": "number"
+          },
+          "dob": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "phone": {
+            "type": "string"
+          },
+          "current_company": {
+            "type": "string"
+          },
+          "price": {
+            "type": "number"
+          },
+          "rating": {
+            "type": "number"
+          },
+          "user_id": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "experience",
+          "interview_count",
+          "dob",
+          "address",
+          "phone",
+          "current_company",
+          "price",
+          "rating",
+          "user_id"
         ]
       },
       "InterviewerProfileResponse": {
@@ -1028,6 +1134,48 @@
           }
         },
         "required": [
+          "availability_date",
+          "availability_time",
+          "status",
+          "interviewer_id"
+        ]
+      },
+      "BulkCreateScheduleDto": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateScheduleDto"
+            }
+          }
+        },
+        "required": [
+          "data"
+        ]
+      },
+      "GetInterviewScheduleDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "availability_date": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "availability_time": {
+            "type": "number"
+          },
+          "status": {
+            "type": "boolean"
+          },
+          "interviewer_id": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
           "availability_date",
           "availability_time",
           "status",

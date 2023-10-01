@@ -149,13 +149,7 @@ const data = [
 ];
 export default function Home() {
   const { data: me } = useUserControllerSelf();
-  const d = useApplicantControllerGetProfile(me.id as string);
 
-  console.log("profile data", d.data);
-
-  const skills = useSkillControllerFindAll();
-
-  console.log("skills", skills.data);
   return (
     <div className="flex flex-col gap-8">
       <div className="rounded-2xl bg-white p-4  gap-4  min-h-[200px]">
@@ -172,7 +166,7 @@ export default function Home() {
         <div className="flex gap-4 mt-4">
           <div className=" rounded-full ">
             <Image
-              src={me.image_url}
+              src={me?.image_url}
               alt="Profile"
               width={100}
               height={100}
@@ -181,7 +175,7 @@ export default function Home() {
             />
           </div>
           <div className="flex-1 flex flex-col">
-            <h1 className="text-lg font-semibold">{me.name}</h1>
+            <h1 className="text-lg font-semibold">{me?.name}</h1>
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-4">
               <div className="flex flex-col">
                 <p className="text-sm">Email</p>

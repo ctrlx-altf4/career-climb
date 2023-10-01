@@ -47,3 +47,22 @@ export function generateHourlyTimeListWithObjects(): TimeSlot[] {
 
   return timeList;
 }
+
+export function formatTime(input: number): string {
+  if (input < 0 || input > 2359) {
+    return "Invalid input";
+  }
+
+  let hours = Math.floor(input / 100);
+  const minutes = input % 100;
+  const isPM = hours >= 12;
+
+  if (hours > 12) {
+    hours -= 12;
+  }
+
+  const formattedHours = hours.toString().padStart(2, "0");
+  const formattedMinutes = minutes.toString().padStart(2, "0");
+
+  return `${formattedHours}:${formattedMinutes} ${isPM ? "PM" : "AM"}`;
+}

@@ -88,11 +88,23 @@ export interface CreateSkillDto {
   skill_experience: number;
 }
 
+export interface GetInterviewScheduleDto {
+  id: number;
+  availability_date: string;
+  availability_time: number;
+  status: boolean;
+  interviewer_id: number;
+}
+
 export interface CreateScheduleDto {
   availability_date: string;
   availability_time: number;
   status: boolean;
   interviewer_id: number;
+}
+
+export interface BulkCreateScheduleDto {
+  data: CreateScheduleDto[];
 }
 
 export interface UpdateInterviewerDto {
@@ -114,6 +126,19 @@ export interface InterviewerProfileResponse {
   price: number;
 }
 
+export interface GetInterviewerDto {
+  id: number;
+  experience: number;
+  interview_count: number;
+  dob: string;
+  address: string;
+  phone: string;
+  current_company: string;
+  price: number;
+  rating: number;
+  user_id: number;
+}
+
 export type AllInterviewerResponseUser = {
   name?: string;
   image_url?: string;
@@ -121,6 +146,7 @@ export type AllInterviewerResponseUser = {
 
 export interface AllInterviewerResponse {
   experience: number;
+  user_id: number;
   address: string;
   current_company: string;
   price: number;
@@ -149,6 +175,20 @@ export interface PersonalProfileResponse {
 export interface SocialProfileResponse {
   linkedin_url: string;
   github_url: string;
+}
+
+export interface GetApplicantDto {
+  id: number;
+  experience: number;
+  interview_count: number;
+  dob: string;
+  address: string;
+  phone: string;
+  current_company: string;
+  linkedin_url: string;
+  github_url: string;
+  rating: number;
+  user_id: number;
 }
 
 export interface CreateApplicantDto {
@@ -595,7 +635,7 @@ export const useApplicantControllerCreate = <
 };
 
 export const useApplicantControllerGetProfileHook = () => {
-  const applicantControllerGetProfile = useAxios<CreateApplicantDto>();
+  const applicantControllerGetProfile = useAxios<GetApplicantDto>();
 
   return (userId: string, signal?: AbortSignal) => {
     return applicantControllerGetProfile({
@@ -1095,7 +1135,7 @@ export const useInterviewerControllerGetAllInterviewers = <
 };
 
 export const useInterviewerControllerGetProfileHook = () => {
-  const interviewerControllerGetProfile = useAxios<CreateInterviewerDto>();
+  const interviewerControllerGetProfile = useAxios<GetInterviewerDto>();
 
   return (userId: string, signal?: AbortSignal) => {
     return interviewerControllerGetProfile({
@@ -1353,77 +1393,79 @@ export const useInterviewerControllerUpdate = <
   return useMutation(mutationOptions);
 };
 
-export const useScheduleControllerCreateHook = () => {
-  const scheduleControllerCreate = useAxios<void>();
+export const useScheduleControllerBulkCreateHook = () => {
+  const scheduleControllerBulkCreate = useAxios<void>();
 
-  return (createScheduleDto: BodyType<CreateScheduleDto>) => {
-    return scheduleControllerCreate({
+  return (bulkCreateScheduleDto: BodyType<BulkCreateScheduleDto>) => {
+    return scheduleControllerBulkCreate({
       url: `/interviewer-availability`,
       method: "post",
       headers: { "Content-Type": "application/json" },
-      data: createScheduleDto,
+      data: bulkCreateScheduleDto,
     });
   };
 };
 
-export const useScheduleControllerCreateMutationOptions = <
+export const useScheduleControllerBulkCreateMutationOptions = <
   TError = ErrorType<unknown>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>,
+    Awaited<ReturnType<ReturnType<typeof useScheduleControllerBulkCreateHook>>>,
     TError,
-    { data: BodyType<CreateScheduleDto> },
+    { data: BodyType<BulkCreateScheduleDto> },
     TContext
   >;
 }): UseMutationOptions<
-  Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>,
+  Awaited<ReturnType<ReturnType<typeof useScheduleControllerBulkCreateHook>>>,
   TError,
-  { data: BodyType<CreateScheduleDto> },
+  { data: BodyType<BulkCreateScheduleDto> },
   TContext
 > => {
   const { mutation: mutationOptions } = options ?? {};
 
-  const scheduleControllerCreate = useScheduleControllerCreateHook();
+  const scheduleControllerBulkCreate = useScheduleControllerBulkCreateHook();
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>,
-    { data: BodyType<CreateScheduleDto> }
+    Awaited<ReturnType<ReturnType<typeof useScheduleControllerBulkCreateHook>>>,
+    { data: BodyType<BulkCreateScheduleDto> }
   > = (props) => {
     const { data } = props ?? {};
 
-    return scheduleControllerCreate(data);
+    return scheduleControllerBulkCreate(data);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type ScheduleControllerCreateMutationResult = NonNullable<
-  Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>
+export type ScheduleControllerBulkCreateMutationResult = NonNullable<
+  Awaited<ReturnType<ReturnType<typeof useScheduleControllerBulkCreateHook>>>
 >;
-export type ScheduleControllerCreateMutationBody = BodyType<CreateScheduleDto>;
-export type ScheduleControllerCreateMutationError = ErrorType<unknown>;
+export type ScheduleControllerBulkCreateMutationBody =
+  BodyType<BulkCreateScheduleDto>;
+export type ScheduleControllerBulkCreateMutationError = ErrorType<unknown>;
 
-export const useScheduleControllerCreate = <
+export const useScheduleControllerBulkCreate = <
   TError = ErrorType<unknown>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<ReturnType<typeof useScheduleControllerCreateHook>>>,
+    Awaited<ReturnType<ReturnType<typeof useScheduleControllerBulkCreateHook>>>,
     TError,
-    { data: BodyType<CreateScheduleDto> },
+    { data: BodyType<BulkCreateScheduleDto> },
     TContext
   >;
 }) => {
-  const mutationOptions = useScheduleControllerCreateMutationOptions(options);
+  const mutationOptions =
+    useScheduleControllerBulkCreateMutationOptions(options);
 
   return useMutation(mutationOptions);
 };
 
 export const useScheduleControllerFindAllHook = () => {
-  const scheduleControllerFindAll = useAxios<CreateScheduleDto[]>();
+  const scheduleControllerFindAll = useAxios<GetInterviewScheduleDto[]>();
 
-  return (interviewerId: unknown, signal?: AbortSignal) => {
+  return (interviewerId: number, signal?: AbortSignal) => {
     return scheduleControllerFindAll({
       url: `/interviewer-availability/get-all-schedule/${interviewerId}`,
       method: "get",
@@ -1432,7 +1474,7 @@ export const useScheduleControllerFindAllHook = () => {
   };
 };
 
-export const getScheduleControllerFindAllQueryKey = (interviewerId: unknown) =>
+export const getScheduleControllerFindAllQueryKey = (interviewerId: number) =>
   [`/interviewer-availability/get-all-schedule/${interviewerId}`] as const;
 
 export const useScheduleControllerFindAllQueryOptions = <
@@ -1441,7 +1483,7 @@ export const useScheduleControllerFindAllQueryOptions = <
   >,
   TError = ErrorType<unknown>,
 >(
-  interviewerId: unknown,
+  interviewerId: number,
   options?: {
     query?: UseQueryOptions<
       Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>>,
@@ -1480,7 +1522,7 @@ export const useScheduleControllerFindAll = <
   >,
   TError = ErrorType<unknown>,
 >(
-  interviewerId: unknown,
+  interviewerId: number,
   options?: {
     query?: UseQueryOptions<
       Awaited<ReturnType<ReturnType<typeof useScheduleControllerFindAllHook>>>,
