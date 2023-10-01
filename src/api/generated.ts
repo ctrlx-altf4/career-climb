@@ -84,10 +84,15 @@ export interface UpdateSkillDto {
   skill_experience?: number;
 }
 
+export interface Skill {
+  skill_name: string;
+}
+
 export interface UserSkillResponse {
   skill_id: number;
   skill_name: string;
   skill_experience: number;
+  skill: Skill;
 }
 
 export interface AllSkillResponse {

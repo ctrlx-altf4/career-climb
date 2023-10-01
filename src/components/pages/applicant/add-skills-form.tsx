@@ -16,11 +16,10 @@ import {
 } from "@/components/ui/select";
 import { useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { useRouter } from "next/router";
-import { useQueryClient } from "@tanstack/react-query";
+
 import { experienceArray } from "@/lib/constant";
 
-function ApplicantProfileForm() {
+function ApplicantProfileForm({ onClose }: { onClose?: () => void }) {
   const { data: me } = useUserControllerSelf();
   const { mutateAsync: addUserSkills, isLoading } = useSkillControllerCreate();
 
@@ -34,9 +33,6 @@ function ApplicantProfileForm() {
   } | null>(null);
   const allAddedSkills = data.map((d) => d.skillName);
   const { toast } = useToast();
-
-  const router = useRouter();
-  const queryClient = useQueryClient();
 
   async function onSubmit() {
     if (!me) return;
@@ -55,10 +51,8 @@ function ApplicantProfileForm() {
         });
       });
     }
-    await queryClient.invalidateQueries({
-      queryKey: getUserControllerSelfQueryKey(),
-    });
-    void router.replace("/applicant/dashboard");
+
+    onClose && onClose();
   }
 
   const { data: skills } = useSkillControllerFindAll();

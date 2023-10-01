@@ -1,3 +1,4 @@
+"use client";
 import { ReactElement, useEffect, useState } from "react";
 import {
   getScheduleControllerFindAllQueryKey,
@@ -22,11 +23,6 @@ function isPastDate(date: Date) {
   return differenceInCalendarDays(date, new Date()) < 0;
 }
 
-function OnlyFutureRow(props: RowProps) {
-  const isPastRow = props.dates.every(isPastDate);
-  if (isPastRow) return <></>;
-  return <Row {...props} />;
-}
 export default function Home() {
   const hourlyTimeList: TimeSlot[] = generateHourlyTimeListWithObjects();
   const { data: me } = useUserControllerSelf();

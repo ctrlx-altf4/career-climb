@@ -5,17 +5,6 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function generateHourlyTimeList(): string[] {
-  const timeList: string[] = [];
-  for (let hour = 0; hour < 24; hour++) {
-    const ampm = hour < 12 ? "AM" : "PM";
-    const formattedHour = hour % 12 || 12; // Convert 0 to 12
-    const time = `${formattedHour.toString().padStart(2, "0")}:00 ${ampm}`;
-    timeList.push(time);
-  }
-  return timeList;
-}
-
 export interface TimeSlot {
   label: string;
   value: string;
@@ -49,7 +38,14 @@ export function generateHourlyTimeListWithObjects(): TimeSlot[] {
 }
 
 export function formatTime(input: number): string {
-  if (input < 0 || input > 2359) {
+  if (input < 0 || input > 2400) {
+    return "Invalid input";
+  }
+
+  if (input === 0) {
+    return "12:00 AM";
+  }
+  if (input % 100) {
     return "Invalid input";
   }
 

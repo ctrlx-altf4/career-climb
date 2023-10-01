@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import ApplicantLayout from "@/components/layout/applicant-layout";
 import { ReactElement, useState } from "react";
 import Image from "next/image";
 import {
@@ -32,6 +31,7 @@ import {
 import { experienceArray } from "@/lib/constant";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import AddSkillsForm from "@/components/pages/applicant/add-skills-form";
+import InterviewerLayout from "@/components/layout/interviewer-layout";
 const formSchema = z.object({
   githubUrl: z.string(),
   linkedUrl: z.string(),
@@ -278,5 +278,5 @@ export default function Home() {
 }
 
 Home.getLayout = function getLayout(page: ReactElement) {
-  return <ApplicantLayout>{page}</ApplicantLayout>;
+  return <InterviewerLayout>{page}</InterviewerLayout>;
 };

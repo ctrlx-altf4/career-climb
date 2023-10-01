@@ -1241,6 +1241,17 @@
           "skill_name"
         ]
       },
+      "Skill": {
+        "type": "object",
+        "properties": {
+          "skill_name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "skill_name"
+        ]
+      },
       "UserSkillResponse": {
         "type": "object",
         "properties": {
@@ -1252,12 +1263,16 @@
           },
           "skill_experience": {
             "type": "number"
+          },
+          "skill": {
+            "$ref": "#/components/schemas/Skill"
           }
         },
         "required": [
           "skill_id",
           "skill_name",
-          "skill_experience"
+          "skill_experience",
+          "skill"
         ]
       },
       "UpdateSkillDto": {

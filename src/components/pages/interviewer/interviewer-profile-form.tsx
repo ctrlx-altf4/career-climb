@@ -13,26 +13,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
+  getUserControllerSelfQueryKey,
   useInterviewerControllerCreate,
   useUserControllerSelf,
 } from "@/api/generated";
 import { parsePhoneNumber } from "libphonenumber-js";
 import { Loader2 } from "lucide-react";
-import AddSkillsForm from "@/components/pages/applicant/add-skills-form";
 import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
-
-//
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
+import { useRouter } from "next/router";
+import { useQueryClient } from "@tanstack/react-query";
 
 const formSchema = z.object({
-  price: z.number().default(500),
+  price: z.string().default("500"),
   address: z.string(),
   phone: z.string().refine((value) => {
     if (!value) return false;
@@ -50,16 +42,18 @@ function ApplicantProfileForm() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      price: 500,
+      price: "500",
     },
   });
 
   const { data: me } = useUserControllerSelf();
   const { mutateAsync, isLoading } = useInterviewerControllerCreate();
 
-  const [showSkillsForm, setShowSkillsForm] = useState(false);
   const { toast } = useToast();
-  // 2. Define a submit handler.
+
+  const queryClient = useQueryClient();
+
+  const router = useRouter();
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
@@ -75,13 +69,16 @@ function ApplicantProfileForm() {
         address: values.address,
         phone: values.phone,
         current_company: values.current_company,
-        price: values.price,
+        price: +values.price,
         user_id: me.id,
         rating: 0,
       },
     })
-      .then(() => {
-        setShowSkillsForm(true);
+      .then(async () => {
+        await queryClient.invalidateQueries({
+          queryKey: getUserControllerSelfQueryKey(),
+        });
+        void router.push("/interviewer/dashboard");
       })
       .catch(() => {
         toast({
@@ -91,7 +88,6 @@ function ApplicantProfileForm() {
       });
   }
 
-  if (showSkillsForm) return <AddSkillsForm />;
   return (
     <div>
       <h1 className="text-lg font-medium ">Please Complete Your Profile</h1>

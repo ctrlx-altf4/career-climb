@@ -13,24 +13,15 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
+  getUserControllerSelfQueryKey,
   useApplicantControllerCreate,
-  useSkillControllerFindAll,
   useUserControllerSelf,
 } from "@/api/generated";
 import { parsePhoneNumber } from "libphonenumber-js";
 import { Loader2 } from "lucide-react";
-import AddSkillsForm from "@/components/pages/applicant/add-skills-form";
 import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
-
-//
-// import {
-//   Select,
-//   SelectContent,
-//   SelectItem,
-//   SelectTrigger,
-//   SelectValue,
-// } from "@/components/ui/select";
+import { useRouter } from "next/router";
+import { useQueryClient } from "@tanstack/react-query";
 
 const formSchema = z.object({
   githubUrl: z
@@ -68,17 +59,19 @@ function ApplicantProfileForm() {
     },
   });
 
+  const router = useRouter();
+
   const { data: me } = useUserControllerSelf();
   const { mutateAsync, isLoading } = useApplicantControllerCreate();
 
-  const [showSkillsForm, setShowSkillsForm] = useState(false);
   const { toast } = useToast();
+
+  const queryClient = useQueryClient();
   // 2. Define a submit handler.
   function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
 
-    // TODO: handle properly
     if (!me) return;
     mutateAsync({
       data: {
@@ -94,10 +87,13 @@ function ApplicantProfileForm() {
         rating: 0,
       },
     })
-      .then((res) => {
-        setShowSkillsForm(true);
+      .then(async () => {
+        await queryClient.invalidateQueries({
+          queryKey: getUserControllerSelfQueryKey(),
+        });
+        void router.push("/applicant/dashboard");
       })
-      .catch((err) => {
+      .catch(() => {
         toast({
           title: "Failed to submit",
           description: "Please Try again, Something went wrong",
@@ -105,7 +101,6 @@ function ApplicantProfileForm() {
       });
   }
 
-  if (showSkillsForm) return <AddSkillsForm />;
   return (
     <div>
       <h1 className="text-lg font-medium ">Please Complete Your Profile</h1>

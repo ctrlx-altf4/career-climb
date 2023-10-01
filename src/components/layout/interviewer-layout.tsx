@@ -26,17 +26,17 @@ const routes = [
   {
     label: "Home",
     icon: <HomeIcon size={18} />,
-    pathname: "/",
+    pathname: "/interviewer/dashboard",
   },
   {
     label: "Profile",
     icon: <User2Icon size={18} />,
-    pathname: "/profile",
+    pathname: "/interviewer/profile",
   },
   {
     label: "Session",
     icon: <TargetIcon size={18} />,
-    pathname: "/session",
+    pathname: "/interviewer/session",
   },
   {
     label: "Feedback",
@@ -110,7 +110,7 @@ function Sidebar() {
               <Button
                 onClick={() => {
                   logout();
-                  if (window !== undefined) window.location.reload();
+                  void router.reload();
                 }}
               >
                 Logout

@@ -8,6 +8,16 @@ const nextConfig = {
         hostname: "lh3.googleusercontent.com",
         port: "",
       },
+      {
+        protocol: "https",
+        hostname: "avatars.githubusercontent.com",
+        port: "",
+      },
+      {
+        protocol: "https",
+        hostname: "cloudflare-ipfs.com",
+        port: "",
+      },
     ],
   },
 };

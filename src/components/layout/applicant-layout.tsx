@@ -31,7 +31,7 @@ const routes = [
   {
     label: "Profile",
     icon: <User2Icon size={18} />,
-    pathname: "/profile",
+    pathname: "/applicant/profile",
   },
   {
     label: "Session",
@@ -55,7 +55,6 @@ function Sidebar() {
   const { data: me } = useUserControllerSelf();
 
   const logout = useAuthStore((state) => state.logout);
-  const [confirmLogout, setConfirmLogout] = useState(false);
   //TODO:
   if (!me) return null;
   return (
@@ -110,7 +109,7 @@ function Sidebar() {
               <Button
                 onClick={() => {
                   logout();
-                  if (window !== undefined) window.location.reload();
+                  router.reload();
                 }}
               >
                 Logout
