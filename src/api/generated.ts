@@ -28,6 +28,7 @@ export type ApplicantResponseInterviewer = {
 };
 
 export interface ApplicantResponse {
+  session_id: number;
   interview_date: string;
   interview_time: number;
   interview_status: string;
@@ -49,11 +50,23 @@ export type InterviewerResponseApplicant = {
 };
 
 export interface InterviewerResponse {
+  session_id: number;
   interview_date: string;
   interview_time: number;
   interview_status: string;
   interviewer_id: number;
   applicant: InterviewerResponseApplicant;
+}
+
+export interface KhaltiResponse {
+  pidx: string;
+  payment_url: string;
+  expires_at: string;
+  expires_in: string;
+}
+
+export interface PayForInterViewDto {
+  session_id: number;
 }
 
 export interface CreateInterviewDto {
@@ -2095,6 +2108,87 @@ export const useInterviewControllerCreate = <
   >;
 }) => {
   const mutationOptions = useInterviewControllerCreateMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+
+export const useInterviewControllerPayForInterviewHook = () => {
+  const interviewControllerPayForInterview = useAxios<KhaltiResponse>();
+
+  return (payForInterViewDto: BodyType<PayForInterViewDto>) => {
+    return interviewControllerPayForInterview({
+      url: `/interview/pay-for-interview`,
+      method: "post",
+      headers: { "Content-Type": "application/json" },
+      data: payForInterViewDto,
+    });
+  };
+};
+
+export const useInterviewControllerPayForInterviewMutationOptions = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<
+      ReturnType<ReturnType<typeof useInterviewControllerPayForInterviewHook>>
+    >,
+    TError,
+    { data: BodyType<PayForInterViewDto> },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<
+    ReturnType<ReturnType<typeof useInterviewControllerPayForInterviewHook>>
+  >,
+  TError,
+  { data: BodyType<PayForInterViewDto> },
+  TContext
+> => {
+  const { mutation: mutationOptions } = options ?? {};
+
+  const interviewControllerPayForInterview =
+    useInterviewControllerPayForInterviewHook();
+
+  const mutationFn: MutationFunction<
+    Awaited<
+      ReturnType<ReturnType<typeof useInterviewControllerPayForInterviewHook>>
+    >,
+    { data: BodyType<PayForInterViewDto> }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return interviewControllerPayForInterview(data);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type InterviewControllerPayForInterviewMutationResult = NonNullable<
+  Awaited<
+    ReturnType<ReturnType<typeof useInterviewControllerPayForInterviewHook>>
+  >
+>;
+export type InterviewControllerPayForInterviewMutationBody =
+  BodyType<PayForInterViewDto>;
+export type InterviewControllerPayForInterviewMutationError =
+  ErrorType<unknown>;
+
+export const useInterviewControllerPayForInterview = <
+  TError = ErrorType<unknown>,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<
+      ReturnType<ReturnType<typeof useInterviewControllerPayForInterviewHook>>
+    >,
+    TError,
+    { data: BodyType<PayForInterViewDto> },
+    TContext
+  >;
+}) => {
+  const mutationOptions =
+    useInterviewControllerPayForInterviewMutationOptions(options);
 
   return useMutation(mutationOptions);
 };

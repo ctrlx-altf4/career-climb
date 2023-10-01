@@ -655,6 +655,37 @@
         ]
       }
     },
+    "/interview/pay-for-interview": {
+      "post": {
+        "operationId": "InterviewController_payForInterview",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PayForInterViewDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KhaltiResponse"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "interview"
+        ]
+      }
+    },
     "/interview/interviewer-interviews/{interviewer_id}": {
       "get": {
         "operationId": "InterviewController_getInterviewerInterview",
@@ -697,12 +728,6 @@
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "interviewer_id",
-            "required": true,
-            "in": "path",
-            "schema": {}
           }
         ],
         "responses": {
@@ -1281,9 +1306,46 @@
           "applicant_id"
         ]
       },
+      "PayForInterViewDto": {
+        "type": "object",
+        "properties": {
+          "session_id": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "session_id"
+        ]
+      },
+      "KhaltiResponse": {
+        "type": "object",
+        "properties": {
+          "pidx": {
+            "type": "string"
+          },
+          "payment_url": {
+            "type": "string"
+          },
+          "expires_at": {
+            "type": "string"
+          },
+          "expires_in": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "pidx",
+          "payment_url",
+          "expires_at",
+          "expires_in"
+        ]
+      },
       "InterviewerResponse": {
         "type": "object",
         "properties": {
+          "session_id": {
+            "type": "number"
+          },
           "interview_date": {
             "format": "date-time",
             "type": "string"
@@ -1327,6 +1389,7 @@
           }
         },
         "required": [
+          "session_id",
           "interview_date",
           "interview_time",
           "interview_status",
@@ -1337,6 +1400,9 @@
       "ApplicantResponse": {
         "type": "object",
         "properties": {
+          "session_id": {
+            "type": "number"
+          },
           "interview_date": {
             "format": "date-time",
             "type": "string"
@@ -1374,6 +1440,7 @@
           }
         },
         "required": [
+          "session_id",
           "interview_date",
           "interview_time",
           "interview_status",

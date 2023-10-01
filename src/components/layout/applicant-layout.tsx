@@ -26,7 +26,7 @@ const routes = [
   {
     label: "Home",
     icon: <HomeIcon size={18} />,
-    pathname: "/",
+    pathname: "/applicant/dashboard",
   },
   {
     label: "Profile",
@@ -36,7 +36,7 @@ const routes = [
   {
     label: "Session",
     icon: <TargetIcon size={18} />,
-    pathname: "/session",
+    pathname: "/applicant/session",
   },
   {
     label: "Feedback",

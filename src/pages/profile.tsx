@@ -4,7 +4,6 @@ import { ReactElement } from "react";
 import Image from "next/image";
 import {
   DollarSignIcon,
-  HomeIcon,
   MessageSquare,
   PenIcon,
   StarIcon,
@@ -51,7 +50,6 @@ function ProfessionalDetailsForm() {
   const { data: skills } = useSkillControllerFindOne(String(me?.id));
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
     alert("NOT implemented");
   }
   return (
@@ -166,12 +164,10 @@ export default function Home() {
         <div className="flex gap-4 mt-4">
           <div className=" rounded-full ">
             <Image
-              src={me?.image_url}
+              src={me?.image_url!}
               alt="Profile"
               width={100}
               height={100}
-
-              // className="object-fill rounded-full overflow-hidden"
             />
           </div>
           <div className="flex-1 flex flex-col">

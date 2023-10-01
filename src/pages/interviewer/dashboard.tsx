@@ -36,7 +36,7 @@ export default function Home() {
   const { mutateAsync } = useScheduleControllerBulkCreate();
 
   const { toast } = useToast();
-  const { data: schedules } = useScheduleControllerFindAll(String(me?.id));
+  const { data: schedules } = useScheduleControllerFindAll(me?.id!);
 
   useEffect(() => {
     if (schedules) {
@@ -62,7 +62,7 @@ export default function Home() {
         description: "Your Availability has been updated Successfully",
       });
       await queryClient.invalidateQueries({
-        queryKey: getScheduleControllerFindAllQueryKey(String(me?.id)),
+        queryKey: getScheduleControllerFindAllQueryKey(me?.id),
       });
     });
   };

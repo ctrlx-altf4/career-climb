@@ -2,11 +2,7 @@ import { Button } from "@/components/ui/button";
 import ApplicantLayout from "@/components/layout/applicant-layout";
 import { ReactElement, useState } from "react";
 import {
-  CreateScheduleDto,
-  useAppControllerGetHello,
-  useAppControllerGetHelloHook,
   useApplicantControllerGetProfile,
-  useAuthControllerGoogleAuth,
   useInterviewControllerCreate,
   useInterviewerControllerGetAllInterviewers,
   useInterviewerControllerGetProfile,
@@ -19,23 +15,15 @@ import {
   ClockIcon,
   DollarSignIcon,
   MessageSquare,
-  PenIcon,
   StarIcon,
   UserCheck2Icon,
 } from "lucide-react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Calendar } from "@/components/ui/calendar";
-import { differenceInCalendarDays, format, isSameDay } from "date-fns";
-import {
-  formatTime,
-  generateHourlyTimeListWithObjects,
-  TimeSlot,
-} from "@/lib/utils";
+import { formatTime } from "@/lib/utils";
 import { useToast } from "@/components/ui/use-toast";
+import { format } from "date-fns";
+import { useRouter } from "next/router";
 
-function isPastDate(date: Date) {
-  return differenceInCalendarDays(date, new Date()) < 0;
-}
 function InterviewerSchduleDialog({
   open,
   id,
@@ -46,31 +34,17 @@ function InterviewerSchduleDialog({
   onClose: () => void;
 }) {
   const { data: schedules } = useScheduleControllerFindAll(+id);
-  // const hourlyTimeList: TimeSlot[] = generateHourlyTimeListWithObjects();
 
   const { data: me } = useUserControllerSelf();
   const [selected, setSelected] = useState(0);
-  const [date, setDate] = useState(new Date());
 
   // This is so fucked up:
   const { data: applicant } = useApplicantControllerGetProfile(String(me?.id));
   const { data: interviewer } = useInterviewerControllerGetProfile(String(id));
 
   const { mutateAsync, isLoading } = useInterviewControllerCreate();
-  // const grouped = schedules?.reduce(
-  //   (acc, curr) => {
-  //     return {
-  //       ...acc,
-  //       [curr.availability_date]: [
-  //         ...(acc[curr.availability_date] ?? []),
-  //         curr,
-  //       ],
-  //     };
-  //   },
-  //   {} as Record<string, CreateScheduleDto[]>,
-  // );
-  //
-  // console.log("grouped", grouped);
+
+  const router = useRouter();
 
   const { toast } = useToast();
   return (
@@ -131,6 +105,8 @@ function InterviewerSchduleDialog({
                     payment_id: "", // backend devs are.. I don't know.. rusy.
                   },
                 }).then((res) => {
+                  router.push("/applicant/session");
+
                   toast({
                     title: "Interview Scheduled Successfully",
                     description:
